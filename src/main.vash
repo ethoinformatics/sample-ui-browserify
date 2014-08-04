@@ -6,5 +6,10 @@
 	<div class="row">
 		<p class="text-right"><a class="js-btn-save btn btn-success btn-lg" role="button">Save</a></p>
 	</div>
+	<div class="row">
+		<pre id="results" style="display:none;">
+
+		</pre>
+	</div>
 </div>
 

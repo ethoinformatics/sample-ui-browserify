@@ -28,7 +28,10 @@ $(function(){
 		});
 
 		$btnSave.on('click', function(){
-			console.dir(recordList.getData());
+			var data = recordList.getData();
+			$body.find('pre#results')
+				.text(JSON.stringify(data, null, "\t"))
+				.fadeIn();
 		});
 });
 
