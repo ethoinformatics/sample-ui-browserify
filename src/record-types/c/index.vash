@@ -1,11 +1,11 @@
 <form role="form">
   <div class="form-group">
     <label>Latitude</label>
-    <input class="js-lat" readonly type="text" class="form-control" placeholder="unknown">
+    <input class="js-lat" type="text" class="form-control" placeholder="unknown">
   </div>
   <div class="form-group">
     <label>Latitude</label>
-    <input class="js-lng" readonly type="text" class="form-control" placeholder="unknown">
+    <input class="js-lng" type="text" class="form-control" placeholder="unknown">
   </div>
-  <button class="js-get-location">Load current location</button>
+  <button type="button" class="js-get-location">Load current location</button>
 </form>
