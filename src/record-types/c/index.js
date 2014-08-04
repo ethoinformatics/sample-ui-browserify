@@ -7,6 +7,8 @@ function RecordA(){
 
 	var self = this;
 	self.$element = $(template({ }));
+	self.type = 'Record C';
+	self.description = 'tmp desc';
 	self.getData = function(){
 		return {
 			name: getTxtField('.name'),

@@ -1,0 +1,12 @@
+<tr>
+	<td>
+		<strong>@model.type</strong> - <em>@model.description</em>
+	</td>
+	<td>
+	</td>
+	<td class="text-right">
+		<button class="js-edit btn btn-primary">Edit</button>
+		&nbsp;
+		<button class="js-delete btn btn-danger">Remove</button>
+	</td>
+</tr>
