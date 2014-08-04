@@ -1,6 +1,6 @@
 <tr>
 	<td>
-		<strong>@model.type</strong> - <em>@model.description</em>
+		<strong>@model.type</strong>
 	</td>
 	<td>
 	</td>
