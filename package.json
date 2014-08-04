@@ -4,7 +4,7 @@
   "description": "This sample uses browserify to organize the code in to modules, vash for client side rendering of templates and jQuery for everything else",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "./node_modules/.bin/nodemon ./build.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,15 @@
   "bugs": {
     "url": "https://github.com/ethoinformatics/sample-ui-browserify/issues"
   },
-  "homepage": "https://github.com/ethoinformatics/sample-ui-browserify"
+  "homepage": "https://github.com/ethoinformatics/sample-ui-browserify",
+  "dependencies": {
+    "browserify": "^5.9.1",
+    "jquery": "^2.1.1",
+    "mkdirp": "^0.5.0",
+    "node-lessify": "0.0.4",
+    "vashify": "^0.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.2.1"
+  }
 }
