@@ -8694,19 +8694,6 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
         html.vl = 3, html.vc = 21;
         __vbuffer.push('</strong>');
         html.vl = 3, html.vc = 30;
-        __vbuffer.push(' ');
-        html.vl = 3, html.vc = 31;
-        __vbuffer.push('-');
-        html.vl = 3, html.vc = 32;
-        __vbuffer.push(' ');
-        html.vl = 3, html.vc = 33;
-        __vbuffer.push('<em>');
-        html.vl = 3, html.vc = 38;
-        __vbuffer.push(html.escape(model.description).toHtmlString());
-        html.vl = 3, html.vc = 44;
-        html.vl = 3, html.vc = 55;
-        __vbuffer.push('</em>');
-        html.vl = 3, html.vc = 60;
         __vbuffer.push('\n');
         html.vl = 4, html.vc = 0;
         __vbuffer.push('\t');
@@ -8781,7 +8768,7 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
         __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
         return __vopts && __vopts.asContext ? html : html.toString();
     } catch (e) {
-        html.reportError(e, html.vl, html.vc, '<tr>!LB!\t<td>!LB!\t\t<strong>@model.type</strong> - <em>@model.description</em>!LB!\t</td>!LB!\t<td>!LB!\t</td>!LB!\t<td class="text-right">!LB!\t\t<button class="js-edit btn btn-primary">Edit</button>!LB!\t\t&nbsp;!LB!\t\t<button class="js-delete btn btn-danger">Remove</button>!LB!\t</td>!LB!</tr>!LB!');
+        html.reportError(e, html.vl, html.vc, '<tr>!LB!\t<td>!LB!\t\t<strong>@model.type</strong>!LB!\t</td>!LB!\t<td>!LB!\t</td>!LB!\t<td class="text-right">!LB!\t\t<button class="js-edit btn btn-primary">Edit</button>!LB!\t\t&nbsp;!LB!\t\t<button class="js-delete btn btn-danger">Remove</button>!LB!\t</td>!LB!</tr>!LB!');
     }
 }, {
     'simple': false,
@@ -9293,15 +9280,6 @@ function RecordList(){
 			.map(function(record){ return record.getData();})
 			.value();
 	};
-
-	$(this.$element)
-		.find('.js-new-record')
-		.on('click', function(){
-			var $this = $(this);
-
-			self.emit('new-record', $this.text());
-
-		});
 
 }
 
