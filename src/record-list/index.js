@@ -51,15 +51,6 @@ function RecordList(){
 			.value();
 	};
 
-	$(this.$element)
-		.find('.js-new-record')
-		.on('click', function(){
-			var $this = $(this);
-
-			self.emit('new-record', $this.text());
-
-		});
-
 }
 
 module.exports = RecordList;
