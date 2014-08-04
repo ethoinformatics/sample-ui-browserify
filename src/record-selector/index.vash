@@ -1,0 +1,17 @@
+<div class="jumbotron">
+	<h1>Let's add some records</h1>
+	<p>Select a record type and click add.</p>
+	<p>Once all of your records have been added, then click the save button.</p>
+
+	<div class="dropdown">
+		<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+			Dropdown
+			<span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+			@model.recordTypes.forEach(function(recordType){
+				<li role="presentation"><a role="menuitem" tabindex="-1" class="js-new-record" href="#">@recordType</a></li>
+			})
+		</ul>
+	</div>
+</div>
