@@ -1,0 +1,19 @@
+{
+  "name": "sample-ui-browserify",
+  "version": "0.0.0",
+  "description": "This sample uses browserify to organize the code in to modules, vash for client side rendering of templates and jQuery for everything else",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ethoinformatics/sample-ui-browserify.git"
+  },
+  "author": "ethoformatics",
+  "license": "none",
+  "bugs": {
+    "url": "https://github.com/ethoinformatics/sample-ui-browserify/issues"
+  },
+  "homepage": "https://github.com/ethoinformatics/sample-ui-browserify"
+}
