@@ -5,7 +5,8 @@ var $ = window.$,
 
 
 function RecordList(){
-	var self = this, items = [];
+	var self = this, 
+		items = [];
 
 	this.$element = $(listTemplate({}));
 
@@ -29,11 +30,25 @@ function RecordList(){
 
 		$item.find('.js-edit')
 			.on('click', function(){
-				window.alert('not yet...');
+				var $modal = self.$element.filter('.modal');
+				$modal.find('.modal-title').text(item.record.type);
+				$modal.find('.modal-body')
+					.empty()
+					.append(item.record.$element);
+
+				$modal.modal({show: true});
 			});
 
 		items.push(item);
 		this.$element.find('tbody').append($item);
+	};
+
+
+	this.getData = function(){
+		return _.chain(items)
+			.pluck('record')
+			.map(function(record){ return record.getData();})
+			.value();
 	};
 
 	$(this.$element)

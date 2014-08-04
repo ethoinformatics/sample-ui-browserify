@@ -4,7 +4,7 @@
 	<div id="list-container" class="row">
 	</div>
 	<div class="row">
-		<p class="text-right"><a class="btn btn-success btn-lg" role="button">Save</a></p>
+		<p class="text-right"><a class="js-btn-save btn btn-success btn-lg" role="button">Save</a></p>
 	</div>
 </div>
 

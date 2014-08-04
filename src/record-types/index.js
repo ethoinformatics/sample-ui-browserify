@@ -1,5 +1,5 @@
 module.exports = [
-	{name: 'Record A', ctor: require('./a/') },
-	{name: 'Record B', ctor: require('./b/') },
-	{name: 'Record C', ctor: require('./c/') },
+	{name: 'Labeled Flags', ctor: require('./a/') },
+	{name: 'Name and Age', ctor: require('./b/') },
+	{name: 'Current Location', ctor: require('./c/') },
 ];

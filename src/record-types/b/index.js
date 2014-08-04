@@ -3,16 +3,16 @@ var $ = window.$,
 
 function RecordA(){
 
-	function getTxtField(selector){ return self.$element.find(selector).text(); }
+	function getTxtField(selector){ return self.$element.find(selector).val(); }
 
 	var self = this;
 	self.$element = $(template({ }));
-	self.type = 'Record B';
-	self.description = 'tmp desc';
+	self.type = 'Name and age';
+
 	self.getData = function(){
 		return {
-			name: getTxtField('.name'),
-			age: getTxtField('.age'),
+			name: getTxtField('.js-name'),
+			age: getTxtField('.js-age'),
 		};
 	};
 }

@@ -8,6 +8,7 @@ var $ = window.$,
 $(function(){
 	var $body = $('body'),
 		$content = $(mainTemplate({})),
+		$btnSave = $content.find('.js-btn-save'),
 		recordSelector = new RecordSelector({
 				recordTypes: _.pluck(recordTypes, 'name')
 			}),
@@ -24,6 +25,10 @@ $(function(){
 				window.alert('bad recordType: ' + recordTypeName);
 
 			recordList.add(new recordType.ctor());
+		});
+
+		$btnSave.on('click', function(){
+			console.dir(recordList.getData());
 		});
 });
 

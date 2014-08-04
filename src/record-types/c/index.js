@@ -3,16 +3,16 @@ var $ = window.$,
 
 function RecordA(){
 
-	function getTxtField(selector){ return self.$element.find(selector).text(); }
+	function getCoordinateField(selector){ return +self.$element.find(selector).val(); }
 
 	var self = this;
 	self.$element = $(template({ }));
-	self.type = 'Record C';
-	self.description = 'tmp desc';
+	self.type = 'Location';
+
 	self.getData = function(){
 		return {
-			name: getTxtField('.name'),
-			age: getTxtField('.age'),
+			lat: getCoordinateField('.js-lat'),
+			lng: getCoordinateField('.js-lng'),
 		};
 	};
 }

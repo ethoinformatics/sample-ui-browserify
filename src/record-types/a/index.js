@@ -3,16 +3,18 @@ var $ = window.$,
 
 function RecordA(){
 
-	function getTxtField(selector){ return self.$element.find(selector).text(); }
+	function getTxtField(selector){ return self.$element.find(selector).val(); }
+	function getBooleanField(selector){ return self.$element.find(selector).is(':checked'); }
 
 	var self = this;
-	self.type = 'Record A';
-	self.description = 'tmp desc';
+	self.type = 'Labeled flags';
 	self.$element = $(template({ }));
+
 	self.getData = function(){
 		return {
-			name: getTxtField('.name'),
-			age: getTxtField('.age'),
+			label: getTxtField('.js-label'),
+			flagA: getBooleanField('.js-flag-a'),
+			flagB: getBooleanField('.js-flag-b'),
 		};
 	};
 }
