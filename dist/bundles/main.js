@@ -4,7 +4,7 @@ var $ = window.$,
 	recordTypes = require('./record-types'),
 	RecordSelector = require('./record-selector'),
 	RecordList = require('./record-list'),
-	mainTemplate = require("/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/0_main.vash.js");
+	mainTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/0_main.vash.js");
 
 $(function(){
 	var $body = $('body'),
@@ -40,7 +40,7 @@ $(function(){
 
 
 
-},{"./record-list":18,"./record-selector":19,"./record-types":23,"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/0_main.vash.js":10,"lodash":9}],2:[function(require,module,exports){
+},{"./record-list":18,"./record-selector":19,"./record-types":23,"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/0_main.vash.js":10,"lodash":9}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
@@ -8052,7 +8052,7 @@ function hasOwnProperty(obj, prop) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],10:[function(require,module,exports){
-var vash = require('/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
+var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
         var __vbuffer = html.buffer;
@@ -8160,8 +8160,8 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],11:[function(require,module,exports){
-var vash = require('/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],11:[function(require,module,exports){
+var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
         var __vbuffer = html.buffer;
@@ -8350,8 +8350,8 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],12:[function(require,module,exports){
-var vash = require('/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],12:[function(require,module,exports){
+var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
         var __vbuffer = html.buffer;
@@ -8665,8 +8665,8 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],13:[function(require,module,exports){
-var vash = require('/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],13:[function(require,module,exports){
+var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
         var __vbuffer = html.buffer;
@@ -8775,8 +8775,8 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],14:[function(require,module,exports){
-var vash = require('/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],14:[function(require,module,exports){
+var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
         var __vbuffer = html.buffer;
@@ -8972,8 +8972,8 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],15:[function(require,module,exports){
-var vash = require('/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],15:[function(require,module,exports){
+var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
         var __vbuffer = html.buffer;
@@ -9085,8 +9085,8 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],16:[function(require,module,exports){
-var vash = require('/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],16:[function(require,module,exports){
+var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
         var __vbuffer = html.buffer;
@@ -9218,7 +9218,7 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],17:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],17:[function(require,module,exports){
 /**
  * Vash - JavaScript Template Parser, v0.7.12-1
  *
@@ -9230,8 +9230,8 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
 },{"fs":2,"path":5}],18:[function(require,module,exports){
 var $ = window.$,
 	_ = require('lodash'),
-	listTemplate = require("/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/2_index.vash.js"),
-	itemTemplate = require("/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/3_item.vash.js");
+	listTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/2_index.vash.js"),
+	itemTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/3_item.vash.js");
 
 
 function RecordList(){
@@ -9285,11 +9285,11 @@ function RecordList(){
 
 module.exports = RecordList;
 
-},{"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/2_index.vash.js":12,"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/3_item.vash.js":13,"lodash":9}],19:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/2_index.vash.js":12,"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/3_item.vash.js":13,"lodash":9}],19:[function(require,module,exports){
 var $ = window.$,
 	util = require('util'),
 	EventEmitter = require('events').EventEmitter,
-	template = require("/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/1_index.vash.js");
+	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/1_index.vash.js");
 
 
 function RecordSelector(params){
@@ -9314,9 +9314,9 @@ function RecordSelector(params){
 util.inherits(RecordSelector, EventEmitter);
 module.exports = RecordSelector;
 
-},{"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/1_index.vash.js":11,"events":3,"util":8}],20:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/1_index.vash.js":11,"events":3,"util":8}],20:[function(require,module,exports){
 var $ = window.$,
-	template = require("/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/4_index.vash.js");
+	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/4_index.vash.js");
 
 function RecordA(){
 
@@ -9338,9 +9338,9 @@ function RecordA(){
 
 module.exports = RecordA;
 
-},{"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/4_index.vash.js":14}],21:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/4_index.vash.js":14}],21:[function(require,module,exports){
 var $ = window.$,
-	template = require("/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/5_index.vash.js");
+	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/5_index.vash.js");
 
 function RecordA(){
 
@@ -9360,9 +9360,9 @@ function RecordA(){
 
 module.exports = RecordA;
 
-},{"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/5_index.vash.js":15}],22:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/5_index.vash.js":15}],22:[function(require,module,exports){
 var $ = window.$,
-	template = require("/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/6_index.vash.js");
+	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/6_index.vash.js");
 
 
 function RecordA(){
@@ -9398,7 +9398,7 @@ function RecordA(){
 
 module.exports = RecordA;
 
-},{"/Users/mchevett/code/ethoinformatics/sample-ui-browserify/node_modules/vashify/.temp/6_index.vash.js":16}],23:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/6_index.vash.js":16}],23:[function(require,module,exports){
 module.exports = [
 	{name: 'Labeled Flags', ctor: require('./a/') },
 	{name: 'Name and Age', ctor: require('./b/') },
