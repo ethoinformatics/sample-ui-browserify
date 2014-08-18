@@ -13,11 +13,11 @@ function RecordSelector(params){
 		}));
 
 	$(this.$element)
-		.find('.js-new-record')
-		.on('click', function(){
+		.find('select')
+		.on('change', function(){
 			var $this = $(this);
 
-			self.emit('new-record', $this.text());
+			self.emit('new-record', $this.val());
 		});
 
 }

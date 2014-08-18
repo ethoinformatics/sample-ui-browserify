@@ -1,12 +1,4 @@
- <tr>
-	<td>
-		<strong>@model.type</strong>
-	</td>
-	<td>
-	</td>
-	<td class="text-right">
-		<button type="button" class="js-delete btn btn-danger btn-lg">
-			<span class="glyphicon glyphicon-remove"></span>
-		  </button>
-	</td>
-</tr>
+ <div class="item item-icon-right">
+	@model.type
+	<i class="js-delete icon assertive ion-close-circled"></i>
+</div>

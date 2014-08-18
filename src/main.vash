@@ -1,15 +1,18 @@
-<div class="container container-fluid">
-	<div id="select-container" class="row">
-	</div>
-	<div id="list-container" class="row">
-	</div>
-	<div class="row">
-		<p class="text-right"><a class="js-btn-save btn btn-success btn-lg" role="button">Save</a></p>
-	</div>
-	<div class="row">
-		<pre id="results" style="display:none;">
+<div class="pane">
+	<div class="bar bar-header bar-dark">
+		  <h1 class="title">Record Manager</h1>
+		  <button class="js-btn-save button button-balanced">Save</button>
+	  </div>
+	<div class="content has-header">
+		<ul class="list">
+			<li id="select-container" class="item item-input item-select">
+			</li>
+		</ul>
+		<ul id="list-container" class="list">
 
-		</pre>
+		</ul>
+	</div>
+
+	<div class="bar bar-footer bar-dark">
 	</div>
 </div>
-

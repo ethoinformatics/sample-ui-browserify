@@ -1,0 +1,2 @@
+@{var r = JSON.stringify(model, null, "\t"); }
+<pre>@r</pre>

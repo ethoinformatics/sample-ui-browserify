@@ -3,6 +3,8 @@ var $ = window.$,
 	recordTypes = require('./record-types'),
 	RecordSelector = require('./record-selector'),
 	RecordList = require('./record-list'),
+	Modal = require('modal'),
+	resultsTemplate = require('results.vash'),
 	mainTemplate = require('main.vash');
 
 $(function(){
@@ -29,9 +31,9 @@ $(function(){
 
 		$btnSave.on('click', function(){
 			var data = recordList.getData();
-			$body.find('pre#results')
-				.text(JSON.stringify(data, null, "\t"))
-				.fadeIn();
+			var modal = new Modal('Results', resultsTemplate(data));
+
+			modal.show();
 		});
 });
 

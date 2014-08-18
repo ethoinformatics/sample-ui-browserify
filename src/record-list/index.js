@@ -1,6 +1,7 @@
 
 var $ = window.$,
 	_ = require('lodash'),
+	Modal = require('modal'),
 	listTemplate = require('./index.vash'),
 	itemTemplate = require('./item.vash');
 
@@ -9,6 +10,7 @@ function RecordList(){
 	var self = this, 
 		items = [];
 
+	var modal;
 	this.$element = $(listTemplate({}));
 
 	this.add = function(record){
@@ -21,6 +23,7 @@ function RecordList(){
 				$item: $item,
 			};
 
+
 		$item.find('.js-delete')
 			.on('click', function(ev){
 				ev.stopPropagation();
@@ -32,17 +35,12 @@ function RecordList(){
 			});
 
 		$item.on('click', function(){
-				var $modal = self.$element.filter('.modal');
-				$modal.find('.modal-title').text(item.record.type);
-				$modal.find('.modal-body')
-					.empty()
-					.append(item.record.$element);
-
-				$modal.modal({show: true});
+			modal = new Modal(item.record.type, item.record.$element);
+			modal.show();
 			});
 
 		items.push(item);
-		this.$element.find('tbody').append($item);
+		this.$element.filter('.list').append($item);
 	};
 
 

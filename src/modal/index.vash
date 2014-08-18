@@ -1,0 +1,18 @@
+
+<div style="display:none" class="modal">
+	<ion-header-bar>
+		<h1 class="title">Labeled Flags</h1>
+		<div class="buttons">
+		<button class="button button-clear js-close">Close</button>
+		</div>
+	</ion-header-bar>
+	<ion-content>
+		 	<div class="modal-body">
+			</div>
+			<div class="list">
+			<label class="item">
+			  <button class="js-close button button-block button-positive" type="button">Ok</button>
+			</label>
+		  </div>
+	</ion-content>
+</div>
