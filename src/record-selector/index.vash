@@ -1,18 +1,18 @@
-<div class="jumbotron">
-	<h1>Let's add some records</h1>
-	<p>Select a new record type to add.</p>
 
-	<div class="dropdown">
-		<button class="btn btn-lg btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
-			Add a new record
-			<span class="caret"></span>
-		</button>
-		<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Add a new record<span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
 			@model.recordTypes.forEach(function(recordType){
 				<li>
 					<button class="js-new-record btn btn-block btn-default btn-lg">@recordType</button>
 				</li>
 			})
-		</ul>
-	</div>
-</div>
+          </ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
