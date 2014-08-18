@@ -20,7 +20,10 @@ function ReactiveRecord(){
 
 	self.type = 'Reactive Record';
 	self.$element = $(view.el);
-	self.getData = function(){ return model; };
+	self.getData = function(){ 
+		var v = view;
+		debugger
+		return model; };
 }
 
 module.exports = ReactiveRecord;
