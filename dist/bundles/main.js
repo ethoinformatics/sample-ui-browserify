@@ -4,7 +4,9 @@ var $ = window.$,
 	recordTypes = require('./record-types'),
 	RecordSelector = require('./record-selector'),
 	RecordList = require('./record-list'),
-	mainTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/0_main.vash.js");
+	Modal = require('modal'),
+	resultsTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/0_results.vash.js"),
+	mainTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/1_main.vash.js");
 
 $(function(){
 	var $body = $('body'),
@@ -30,9 +32,9 @@ $(function(){
 
 		$btnSave.on('click', function(){
 			var data = recordList.getData();
-			$body.find('pre#results')
-				.text(JSON.stringify(data, null, "\t"))
-				.fadeIn();
+			var modal = new Modal('Results', resultsTemplate(data));
+
+			modal.show();
 		});
 });
 
@@ -40,7 +42,7 @@ $(function(){
 
 
 
-},{"./record-list":18,"./record-selector":19,"./record-types":23,"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/0_main.vash.js":10,"lodash":9}],2:[function(require,module,exports){
+},{"./record-list":21,"./record-selector":22,"./record-types":26,"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/0_results.vash.js":10,"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/1_main.vash.js":11,"lodash":9,"modal":20}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
@@ -8058,109 +8060,31 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
         var __vbuffer = html.buffer;
         html.options = __vopts;
         model = model || {};
-        html.vl = 1, html.vc = 0;
-        __vbuffer.push('<div class="container container-fluid">');
-        html.vl = 1, html.vc = 39;
+        {
+            var r = JSON.stringify(model, null, '\t');
+        }
+        html.vl = 1, html.vc = 46;
         __vbuffer.push('\n');
         html.vl = 2, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 2, html.vc = 1;
-        __vbuffer.push('<div id="select-container" class="row">');
-        html.vl = 2, html.vc = 40;
-        __vbuffer.push('\n');
-        html.vl = 3, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 3, html.vc = 1;
-        __vbuffer.push('</div>');
-        html.vl = 3, html.vc = 7;
-        __vbuffer.push('\n');
-        html.vl = 4, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 4, html.vc = 1;
-        __vbuffer.push('<div id="list-container" class="row">');
-        html.vl = 4, html.vc = 38;
-        __vbuffer.push('\n');
-        html.vl = 5, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 5, html.vc = 1;
-        __vbuffer.push('</div>');
-        html.vl = 5, html.vc = 7;
-        __vbuffer.push('\n');
-        html.vl = 6, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 6, html.vc = 1;
-        __vbuffer.push('<div class="row">');
-        html.vl = 6, html.vc = 18;
-        __vbuffer.push('\n');
-        html.vl = 7, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 7, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 7, html.vc = 2;
-        __vbuffer.push('<p class="text-right">');
-        html.vl = 7, html.vc = 24;
-        __vbuffer.push('<a class="js-btn-save btn btn-success btn-lg" role="button">');
-        html.vl = 7, html.vc = 84;
-        __vbuffer.push('Save');
-        html.vl = 7, html.vc = 88;
-        __vbuffer.push('</a>');
-        html.vl = 7, html.vc = 92;
-        __vbuffer.push('</p>');
-        html.vl = 7, html.vc = 96;
-        __vbuffer.push('\n');
-        html.vl = 8, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 8, html.vc = 1;
-        __vbuffer.push('</div>');
-        html.vl = 8, html.vc = 7;
-        __vbuffer.push('\n');
-        html.vl = 9, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 9, html.vc = 1;
-        __vbuffer.push('<div class="row">');
-        html.vl = 9, html.vc = 18;
-        __vbuffer.push('\n');
-        html.vl = 10, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 10, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 10, html.vc = 2;
-        __vbuffer.push('<pre id="results" style="display:none;">');
-        html.vl = 10, html.vc = 42;
-        __vbuffer.push('\n');
-        html.vl = 11, html.vc = 0;
-        __vbuffer.push('\n');
-        html.vl = 12, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 12, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 12, html.vc = 2;
+        __vbuffer.push('<pre>');
+        html.vl = 2, html.vc = 6;
+        __vbuffer.push(html.escape(r).toHtmlString());
+        html.vl = 2, html.vc = 6;
+        html.vl = 2, html.vc = 7;
         __vbuffer.push('</pre>');
-        html.vl = 12, html.vc = 8;
-        __vbuffer.push('\n');
-        html.vl = 13, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 13, html.vc = 1;
-        __vbuffer.push('</div>');
-        html.vl = 13, html.vc = 7;
-        __vbuffer.push('\n');
-        html.vl = 14, html.vc = 0;
-        __vbuffer.push('</div>');
-        html.vl = 14, html.vc = 6;
-        __vbuffer.push('\n');
-        html.vl = 15, html.vc = 0;
+        html.vl = 2, html.vc = 13;
         __vbuffer.push('\n');
         __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
         return __vopts && __vopts.asContext ? html : html.toString();
     } catch (e) {
-        html.reportError(e, html.vl, html.vc, '<div class="container container-fluid">!LB!\t<div id="select-container" class="row">!LB!\t</div>!LB!\t<div id="list-container" class="row">!LB!\t</div>!LB!\t<div class="row">!LB!\t\t<p class="text-right"><a class="js-btn-save btn btn-success btn-lg" role="button">Save</a></p>!LB!\t</div>!LB!\t<div class="row">!LB!\t\t<pre id="results" style="display:none;">!LB!!LB!\t\t</pre>!LB!\t</div>!LB!</div>!LB!!LB!');
+        html.reportError(e, html.vl, html.vc, '@{var r = JSON.stringify(model, null, "\t"); }!LB!<pre>@r</pre>!LB!');
     }
 }, {
     'simple': false,
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],11:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],11:[function(require,module,exports){
 var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
@@ -8168,107 +8092,73 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
         html.options = __vopts;
         model = model || {};
         html.vl = 1, html.vc = 0;
-        __vbuffer.push('<div class="jumbotron">');
-        html.vl = 1, html.vc = 23;
+        __vbuffer.push('<div class="pane">');
+        html.vl = 1, html.vc = 18;
         __vbuffer.push('\n');
         html.vl = 2, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 2, html.vc = 1;
-        __vbuffer.push('<h1>');
-        html.vl = 2, html.vc = 5;
-        __vbuffer.push('Let');
-        html.vl = 2, html.vc = 8;
-        __vbuffer.push('\'');
-        html.vl = 2, html.vc = 9;
-        __vbuffer.push('s');
-        html.vl = 2, html.vc = 10;
-        __vbuffer.push(' ');
-        html.vl = 2, html.vc = 11;
-        __vbuffer.push('add');
-        html.vl = 2, html.vc = 14;
-        __vbuffer.push(' ');
-        html.vl = 2, html.vc = 15;
-        __vbuffer.push('some');
-        html.vl = 2, html.vc = 19;
-        __vbuffer.push(' ');
-        html.vl = 2, html.vc = 20;
-        __vbuffer.push('records');
-        html.vl = 2, html.vc = 27;
-        __vbuffer.push('</h1>');
-        html.vl = 2, html.vc = 32;
+        __vbuffer.push('<div class="bar bar-header bar-dark">');
+        html.vl = 2, html.vc = 38;
         __vbuffer.push('\n');
         html.vl = 3, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 3, html.vc = 1;
-        __vbuffer.push('<p>');
+        __vbuffer.push('\t');
+        html.vl = 3, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 3, html.vc = 3;
+        __vbuffer.push(' ');
         html.vl = 3, html.vc = 4;
-        __vbuffer.push('Select');
-        html.vl = 3, html.vc = 10;
-        __vbuffer.push(' ');
-        html.vl = 3, html.vc = 11;
-        __vbuffer.push('a');
-        html.vl = 3, html.vc = 12;
-        __vbuffer.push(' ');
-        html.vl = 3, html.vc = 13;
-        __vbuffer.push('new');
-        html.vl = 3, html.vc = 16;
-        __vbuffer.push(' ');
-        html.vl = 3, html.vc = 17;
-        __vbuffer.push('record');
-        html.vl = 3, html.vc = 23;
-        __vbuffer.push(' ');
-        html.vl = 3, html.vc = 24;
-        __vbuffer.push('type');
+        __vbuffer.push('<h1 class="title">');
+        html.vl = 3, html.vc = 22;
+        __vbuffer.push('Record');
         html.vl = 3, html.vc = 28;
         __vbuffer.push(' ');
         html.vl = 3, html.vc = 29;
-        __vbuffer.push('to');
-        html.vl = 3, html.vc = 31;
-        __vbuffer.push(' ');
-        html.vl = 3, html.vc = 32;
-        __vbuffer.push('add');
-        html.vl = 3, html.vc = 35;
-        __vbuffer.push('.');
+        __vbuffer.push('Manager');
         html.vl = 3, html.vc = 36;
-        __vbuffer.push('</p>');
-        html.vl = 3, html.vc = 40;
+        __vbuffer.push('</h1>');
+        html.vl = 3, html.vc = 41;
         __vbuffer.push('\n');
         html.vl = 4, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 4, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 4, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 4, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 4, html.vc = 4;
+        __vbuffer.push('<button class="js-btn-save button button-balanced">');
+        html.vl = 4, html.vc = 55;
+        __vbuffer.push('Save');
+        html.vl = 4, html.vc = 59;
+        __vbuffer.push('</button>');
+        html.vl = 4, html.vc = 68;
         __vbuffer.push('\n');
         html.vl = 5, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 5, html.vc = 1;
-        __vbuffer.push('<div class="dropdown">');
-        html.vl = 5, html.vc = 23;
+        __vbuffer.push(' ');
+        html.vl = 5, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 5, html.vc = 3;
+        __vbuffer.push('</div>');
+        html.vl = 5, html.vc = 9;
         __vbuffer.push('\n');
         html.vl = 6, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 6, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 6, html.vc = 2;
-        __vbuffer.push('<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">');
-        html.vl = 6, html.vc = 106;
+        __vbuffer.push('<div class="content has-header">');
+        html.vl = 6, html.vc = 33;
         __vbuffer.push('\n');
         html.vl = 7, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 7, html.vc = 1;
         __vbuffer.push('\t');
         html.vl = 7, html.vc = 2;
-        __vbuffer.push('\t');
-        html.vl = 7, html.vc = 3;
-        __vbuffer.push('Add');
-        html.vl = 7, html.vc = 6;
-        __vbuffer.push(' ');
-        html.vl = 7, html.vc = 7;
-        __vbuffer.push('a');
-        html.vl = 7, html.vc = 8;
-        __vbuffer.push(' ');
-        html.vl = 7, html.vc = 9;
-        __vbuffer.push('new');
-        html.vl = 7, html.vc = 12;
-        __vbuffer.push(' ');
-        html.vl = 7, html.vc = 13;
-        __vbuffer.push('record');
+        __vbuffer.push('<ul class="list">');
         html.vl = 7, html.vc = 19;
         __vbuffer.push('\n');
         html.vl = 8, html.vc = 0;
@@ -8278,469 +8168,17 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
         html.vl = 8, html.vc = 2;
         __vbuffer.push('\t');
         html.vl = 8, html.vc = 3;
-        __vbuffer.push('<span class="caret">');
-        html.vl = 8, html.vc = 23;
-        __vbuffer.push('</span>');
-        html.vl = 8, html.vc = 30;
+        __vbuffer.push('<li id="select-container" class="item item-input item-select">');
+        html.vl = 8, html.vc = 65;
         __vbuffer.push('\n');
         html.vl = 9, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 9, html.vc = 1;
         __vbuffer.push('\t');
         html.vl = 9, html.vc = 2;
-        __vbuffer.push('</button>');
-        html.vl = 9, html.vc = 11;
-        __vbuffer.push('\n');
-        html.vl = 10, html.vc = 0;
         __vbuffer.push('\t');
-        html.vl = 10, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 10, html.vc = 2;
-        __vbuffer.push('<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">');
-        html.vl = 10, html.vc = 72;
-        __vbuffer.push('\n');
-        html.vl = 11, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 11, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 11, html.vc = 2;
-        __vbuffer.push('\t');
-        html.vl = 11, html.vc = 4;
-        __vbuffer.push(model.recordTypes.forEach(function (recordType) {
-            html.vl = 12, html.vc = 4;
-            __vbuffer.push('<li role="presentation">');
-            html.vl = 12, html.vc = 28;
-            __vbuffer.push('<a role="menuitem" tabindex="-1" class="js-new-record" href="#">');
-            html.vl = 12, html.vc = 93;
-            __vbuffer.push(html.escape(recordType).toHtmlString());
-            html.vl = 12, html.vc = 93;
-            html.vl = 12, html.vc = 103;
-            __vbuffer.push('</a>');
-            html.vl = 12, html.vc = 107;
-            __vbuffer.push('</li>');
-        }));
-        html.vl = 13, html.vc = 4;
-        html.vl = 13, html.vc = 5;
-        __vbuffer.push('\n');
-        html.vl = 14, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 14, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 14, html.vc = 2;
-        __vbuffer.push('</ul>');
-        html.vl = 14, html.vc = 7;
-        __vbuffer.push('\n');
-        html.vl = 15, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 15, html.vc = 1;
-        __vbuffer.push('</div>');
-        html.vl = 15, html.vc = 7;
-        __vbuffer.push('\n');
-        html.vl = 16, html.vc = 0;
-        __vbuffer.push('</div>');
-        html.vl = 16, html.vc = 6;
-        __vbuffer.push('\n');
-        __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
-        return __vopts && __vopts.asContext ? html : html.toString();
-    } catch (e) {
-        html.reportError(e, html.vl, html.vc, '<div class="jumbotron">!LB!\t<h1>Let\'s add some records</h1>!LB!\t<p>Select a new record type to add.</p>!LB!!LB!\t<div class="dropdown">!LB!\t\t<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">!LB!\t\t\tAdd a new record!LB!\t\t\t<span class="caret"></span>!LB!\t\t</button>!LB!\t\t<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">!LB!\t\t\t@model.recordTypes.forEach(function(recordType){!LB!\t\t\t\t<li role="presentation"><a role="menuitem" tabindex="-1" class="js-new-record" href="#">@recordType</a></li>!LB!\t\t\t})!LB!\t\t</ul>!LB!\t</div>!LB!</div>!LB!');
-    }
-}, {
-    'simple': false,
-    'modelName': 'model',
-    'helpersName': 'html'
-});
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],12:[function(require,module,exports){
-var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
-module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
-    try {
-        var __vbuffer = html.buffer;
-        html.options = __vopts;
-        model = model || {};
-        html.vl = 1, html.vc = 0;
-        __vbuffer.push('<table class="table table-striped">');
-        html.vl = 1, html.vc = 35;
-        __vbuffer.push('\n');
-        html.vl = 2, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 2, html.vc = 1;
-        __vbuffer.push('<tbody>');
-        html.vl = 2, html.vc = 8;
-        __vbuffer.push('</tbody>');
-        html.vl = 2, html.vc = 16;
-        __vbuffer.push('\n');
-        html.vl = 3, html.vc = 0;
-        __vbuffer.push('</table>');
-        html.vl = 3, html.vc = 8;
-        __vbuffer.push('\n');
-        html.vl = 4, html.vc = 0;
-        __vbuffer.push('\n');
-        html.vl = 5, html.vc = 0;
-        __vbuffer.push('<');
-        html.vl = 5, html.vc = 1;
-        __vbuffer.push('!');
-        html.vl = 5, html.vc = 2;
-        __vbuffer.push('-');
-        html.vl = 5, html.vc = 3;
-        __vbuffer.push('-');
-        html.vl = 5, html.vc = 4;
-        __vbuffer.push(' ');
-        html.vl = 5, html.vc = 5;
-        __vbuffer.push('Modal');
-        html.vl = 5, html.vc = 10;
-        __vbuffer.push(' ');
-        html.vl = 5, html.vc = 11;
-        __vbuffer.push('-');
-        html.vl = 5, html.vc = 12;
-        __vbuffer.push('-');
-        html.vl = 5, html.vc = 13;
-        __vbuffer.push('>');
-        html.vl = 5, html.vc = 14;
-        __vbuffer.push('\n');
-        html.vl = 6, html.vc = 0;
-        __vbuffer.push('<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">');
-        html.vl = 6, html.vc = 102;
-        __vbuffer.push('\n');
-        html.vl = 7, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 7, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 7, html.vc = 2;
-        __vbuffer.push('<div class="modal-dialog">');
-        html.vl = 7, html.vc = 28;
-        __vbuffer.push('\n');
-        html.vl = 8, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 8, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 8, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 8, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 8, html.vc = 4;
-        __vbuffer.push('<div class="modal-content">');
-        html.vl = 8, html.vc = 31;
-        __vbuffer.push('\n');
-        html.vl = 9, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 9, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 9, html.vc = 2;
-        __vbuffer.push(' ');
         html.vl = 9, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 9, html.vc = 4;
-        __vbuffer.push(' ');
-        html.vl = 9, html.vc = 5;
-        __vbuffer.push(' ');
-        html.vl = 9, html.vc = 6;
-        __vbuffer.push('<div class="modal-header">');
-        html.vl = 9, html.vc = 32;
-        __vbuffer.push('\n');
-        html.vl = 10, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 10, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 10, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 10, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 10, html.vc = 4;
-        __vbuffer.push(' ');
-        html.vl = 10, html.vc = 5;
-        __vbuffer.push(' ');
-        html.vl = 10, html.vc = 6;
-        __vbuffer.push(' ');
-        html.vl = 10, html.vc = 7;
-        __vbuffer.push(' ');
-        html.vl = 10, html.vc = 8;
-        __vbuffer.push('<button type="button" class="close" data-dismiss="modal">');
-        html.vl = 10, html.vc = 65;
-        __vbuffer.push('<span aria-hidden="true">');
-        html.vl = 10, html.vc = 90;
-        __vbuffer.push('&');
-        html.vl = 10, html.vc = 91;
-        __vbuffer.push('times');
-        html.vl = 10, html.vc = 96;
-        __vbuffer.push(';');
-        html.vl = 10, html.vc = 97;
-        __vbuffer.push('</span>');
-        html.vl = 10, html.vc = 104;
-        __vbuffer.push('<span class="sr-only">');
-        html.vl = 10, html.vc = 126;
-        __vbuffer.push('Close');
-        html.vl = 10, html.vc = 131;
-        __vbuffer.push('</span>');
-        html.vl = 10, html.vc = 138;
-        __vbuffer.push('</button>');
-        html.vl = 10, html.vc = 147;
-        __vbuffer.push('\n');
-        html.vl = 11, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 11, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 11, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 11, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 11, html.vc = 4;
-        __vbuffer.push(' ');
-        html.vl = 11, html.vc = 5;
-        __vbuffer.push(' ');
-        html.vl = 11, html.vc = 6;
-        __vbuffer.push(' ');
-        html.vl = 11, html.vc = 7;
-        __vbuffer.push(' ');
-        html.vl = 11, html.vc = 8;
-        __vbuffer.push('<h4 class="modal-title" id="myModalLabel">');
-        html.vl = 11, html.vc = 50;
-        __vbuffer.push('Modal');
-        html.vl = 11, html.vc = 55;
-        __vbuffer.push(' ');
-        html.vl = 11, html.vc = 56;
-        __vbuffer.push('title');
-        html.vl = 11, html.vc = 61;
-        __vbuffer.push('</h4>');
-        html.vl = 11, html.vc = 66;
-        __vbuffer.push('\n');
-        html.vl = 12, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 12, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 12, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 12, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 12, html.vc = 4;
-        __vbuffer.push(' ');
-        html.vl = 12, html.vc = 5;
-        __vbuffer.push(' ');
-        html.vl = 12, html.vc = 6;
-        __vbuffer.push('</div>');
-        html.vl = 12, html.vc = 12;
-        __vbuffer.push('\n');
-        html.vl = 13, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 13, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 13, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 13, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 13, html.vc = 4;
-        __vbuffer.push(' ');
-        html.vl = 13, html.vc = 5;
-        __vbuffer.push(' ');
-        html.vl = 13, html.vc = 6;
-        __vbuffer.push('<div class="modal-body">');
-        html.vl = 13, html.vc = 30;
-        __vbuffer.push('\n');
-        html.vl = 14, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 14, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 14, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 14, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 14, html.vc = 4;
-        __vbuffer.push(' ');
-        html.vl = 14, html.vc = 5;
-        __vbuffer.push(' ');
-        html.vl = 14, html.vc = 6;
-        __vbuffer.push(' ');
-        html.vl = 14, html.vc = 7;
-        __vbuffer.push(' ');
-        html.vl = 14, html.vc = 8;
-        __vbuffer.push('.');
-        html.vl = 14, html.vc = 9;
-        __vbuffer.push('.');
-        html.vl = 14, html.vc = 10;
-        __vbuffer.push('.');
-        html.vl = 14, html.vc = 11;
-        __vbuffer.push('\n');
-        html.vl = 15, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 15, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 15, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 15, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 15, html.vc = 4;
-        __vbuffer.push(' ');
-        html.vl = 15, html.vc = 5;
-        __vbuffer.push(' ');
-        html.vl = 15, html.vc = 6;
-        __vbuffer.push('</div>');
-        html.vl = 15, html.vc = 12;
-        __vbuffer.push('\n');
-        html.vl = 16, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 16, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 16, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 16, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 16, html.vc = 4;
-        __vbuffer.push(' ');
-        html.vl = 16, html.vc = 5;
-        __vbuffer.push(' ');
-        html.vl = 16, html.vc = 6;
-        __vbuffer.push('<div class="modal-footer">');
-        html.vl = 16, html.vc = 32;
-        __vbuffer.push('\n');
-        html.vl = 17, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 17, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 17, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 17, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 17, html.vc = 4;
-        __vbuffer.push(' ');
-        html.vl = 17, html.vc = 5;
-        __vbuffer.push(' ');
-        html.vl = 17, html.vc = 6;
-        __vbuffer.push(' ');
-        html.vl = 17, html.vc = 7;
-        __vbuffer.push(' ');
-        html.vl = 17, html.vc = 8;
-        __vbuffer.push('<button type="button" class="btn btn-default" data-dismiss="modal">');
-        html.vl = 17, html.vc = 75;
-        __vbuffer.push('Okay');
-        html.vl = 17, html.vc = 79;
-        __vbuffer.push('</button>');
-        html.vl = 17, html.vc = 88;
-        __vbuffer.push('\n');
-        html.vl = 18, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 18, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 18, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 18, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 18, html.vc = 4;
-        __vbuffer.push(' ');
-        html.vl = 18, html.vc = 5;
-        __vbuffer.push(' ');
-        html.vl = 18, html.vc = 6;
-        __vbuffer.push('</div>');
-        html.vl = 18, html.vc = 12;
-        __vbuffer.push('\n');
-        html.vl = 19, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 19, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 19, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 19, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 19, html.vc = 4;
-        __vbuffer.push('</div>');
-        html.vl = 19, html.vc = 10;
-        __vbuffer.push('\n');
-        html.vl = 20, html.vc = 0;
-        __vbuffer.push(' ');
-        html.vl = 20, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 20, html.vc = 2;
-        __vbuffer.push('</div>');
-        html.vl = 20, html.vc = 8;
-        __vbuffer.push('\n');
-        html.vl = 21, html.vc = 0;
-        __vbuffer.push('</div>');
-        html.vl = 21, html.vc = 6;
-        __vbuffer.push('\n');
-        __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
-        return __vopts && __vopts.asContext ? html : html.toString();
-    } catch (e) {
-        html.reportError(e, html.vl, html.vc, '<table class="table table-striped">!LB!\t<tbody></tbody>!LB!</table>!LB!!LB!<!-- Modal -->!LB!<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">!LB!  <div class="modal-dialog">!LB!    <div class="modal-content">!LB!      <div class="modal-header">!LB!        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>!LB!        <h4 class="modal-title" id="myModalLabel">Modal title</h4>!LB!      </div>!LB!      <div class="modal-body">!LB!        ...!LB!      </div>!LB!      <div class="modal-footer">!LB!        <button type="button" class="btn btn-default" data-dismiss="modal">Okay</button>!LB!      </div>!LB!    </div>!LB!  </div>!LB!</div>!LB!');
-    }
-}, {
-    'simple': false,
-    'modelName': 'model',
-    'helpersName': 'html'
-});
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],13:[function(require,module,exports){
-var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
-module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
-    try {
-        var __vbuffer = html.buffer;
-        html.options = __vopts;
-        model = model || {};
-        html.vl = 1, html.vc = 0;
-        __vbuffer.push('<tr>');
-        html.vl = 1, html.vc = 4;
-        __vbuffer.push('\n');
-        html.vl = 2, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 2, html.vc = 1;
-        __vbuffer.push('<td>');
-        html.vl = 2, html.vc = 5;
-        __vbuffer.push('\n');
-        html.vl = 3, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 3, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 3, html.vc = 2;
-        __vbuffer.push('<strong>');
-        html.vl = 3, html.vc = 11;
-        __vbuffer.push(html.escape(model.type).toHtmlString());
-        html.vl = 3, html.vc = 17;
-        html.vl = 3, html.vc = 21;
-        __vbuffer.push('</strong>');
-        html.vl = 3, html.vc = 30;
-        __vbuffer.push('\n');
-        html.vl = 4, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 4, html.vc = 1;
-        __vbuffer.push('</td>');
-        html.vl = 4, html.vc = 6;
-        __vbuffer.push('\n');
-        html.vl = 5, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 5, html.vc = 1;
-        __vbuffer.push('<td>');
-        html.vl = 5, html.vc = 5;
-        __vbuffer.push('\n');
-        html.vl = 6, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 6, html.vc = 1;
-        __vbuffer.push('</td>');
-        html.vl = 6, html.vc = 6;
-        __vbuffer.push('\n');
-        html.vl = 7, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 7, html.vc = 1;
-        __vbuffer.push('<td class="text-right">');
-        html.vl = 7, html.vc = 24;
-        __vbuffer.push('\n');
-        html.vl = 8, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 8, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 8, html.vc = 2;
-        __vbuffer.push('<button class="js-edit btn btn-primary">');
-        html.vl = 8, html.vc = 42;
-        __vbuffer.push('Edit');
-        html.vl = 8, html.vc = 46;
-        __vbuffer.push('</button>');
-        html.vl = 8, html.vc = 55;
-        __vbuffer.push('\n');
-        html.vl = 9, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 9, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 9, html.vc = 2;
-        __vbuffer.push('&');
-        html.vl = 9, html.vc = 3;
-        __vbuffer.push('nbsp');
-        html.vl = 9, html.vc = 7;
-        __vbuffer.push(';');
+        __vbuffer.push('</li>');
         html.vl = 9, html.vc = 8;
         __vbuffer.push('\n');
         html.vl = 10, html.vc = 0;
@@ -8748,34 +8186,396 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
         html.vl = 10, html.vc = 1;
         __vbuffer.push('\t');
         html.vl = 10, html.vc = 2;
-        __vbuffer.push('<button class="js-delete btn btn-danger">');
-        html.vl = 10, html.vc = 43;
-        __vbuffer.push('Remove');
-        html.vl = 10, html.vc = 49;
-        __vbuffer.push('</button>');
-        html.vl = 10, html.vc = 58;
+        __vbuffer.push('</ul>');
+        html.vl = 10, html.vc = 7;
         __vbuffer.push('\n');
         html.vl = 11, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 11, html.vc = 1;
-        __vbuffer.push('</td>');
-        html.vl = 11, html.vc = 6;
+        __vbuffer.push('\t');
+        html.vl = 11, html.vc = 2;
+        __vbuffer.push('<ul id="list-container" class="list">');
+        html.vl = 11, html.vc = 39;
         __vbuffer.push('\n');
         html.vl = 12, html.vc = 0;
-        __vbuffer.push('</tr>');
-        html.vl = 12, html.vc = 5;
+        __vbuffer.push('\n');
+        html.vl = 13, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 13, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 13, html.vc = 2;
+        __vbuffer.push('</ul>');
+        html.vl = 13, html.vc = 7;
+        __vbuffer.push('\n');
+        html.vl = 14, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 14, html.vc = 1;
+        __vbuffer.push('</div>');
+        html.vl = 14, html.vc = 7;
+        __vbuffer.push('\n');
+        html.vl = 15, html.vc = 0;
+        __vbuffer.push('\n');
+        html.vl = 16, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 16, html.vc = 1;
+        __vbuffer.push('<div class="bar bar-footer bar-dark">');
+        html.vl = 16, html.vc = 38;
+        __vbuffer.push('\n');
+        html.vl = 17, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 17, html.vc = 1;
+        __vbuffer.push('</div>');
+        html.vl = 17, html.vc = 7;
+        __vbuffer.push('\n');
+        html.vl = 18, html.vc = 0;
+        __vbuffer.push('</div>');
+        html.vl = 18, html.vc = 6;
         __vbuffer.push('\n');
         __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
         return __vopts && __vopts.asContext ? html : html.toString();
     } catch (e) {
-        html.reportError(e, html.vl, html.vc, '<tr>!LB!\t<td>!LB!\t\t<strong>@model.type</strong>!LB!\t</td>!LB!\t<td>!LB!\t</td>!LB!\t<td class="text-right">!LB!\t\t<button class="js-edit btn btn-primary">Edit</button>!LB!\t\t&nbsp;!LB!\t\t<button class="js-delete btn btn-danger">Remove</button>!LB!\t</td>!LB!</tr>!LB!');
+        html.reportError(e, html.vl, html.vc, '<div class="pane">!LB!\t<div class="bar bar-header bar-dark">!LB!\t\t  <h1 class="title">Record Manager</h1>!LB!\t\t  <button class="js-btn-save button button-balanced">Save</button>!LB!\t  </div>!LB!\t<div class="content has-header">!LB!\t\t<ul class="list">!LB!\t\t\t<li id="select-container" class="item item-input item-select">!LB!\t\t\t</li>!LB!\t\t</ul>!LB!\t\t<ul id="list-container" class="list">!LB!!LB!\t\t</ul>!LB!\t</div>!LB!!LB!\t<div class="bar bar-footer bar-dark">!LB!\t</div>!LB!</div>!LB!');
     }
 }, {
     'simple': false,
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],14:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],12:[function(require,module,exports){
+var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
+module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
+    try {
+        var __vbuffer = html.buffer;
+        html.options = __vopts;
+        model = model || {};
+        html.vl = 1, html.vc = 0;
+        __vbuffer.push('\n');
+        html.vl = 2, html.vc = 0;
+        __vbuffer.push('<div style="display:none" class="modal">');
+        html.vl = 2, html.vc = 40;
+        __vbuffer.push('\n');
+        html.vl = 3, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 3, html.vc = 1;
+        __vbuffer.push('<ion-header-bar>');
+        html.vl = 3, html.vc = 17;
+        __vbuffer.push('\n');
+        html.vl = 4, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 4, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 4, html.vc = 2;
+        __vbuffer.push('<h1 class="title">');
+        html.vl = 4, html.vc = 20;
+        __vbuffer.push('Labeled');
+        html.vl = 4, html.vc = 27;
+        __vbuffer.push(' ');
+        html.vl = 4, html.vc = 28;
+        __vbuffer.push('Flags');
+        html.vl = 4, html.vc = 33;
+        __vbuffer.push('</h1>');
+        html.vl = 4, html.vc = 38;
+        __vbuffer.push('\n');
+        html.vl = 5, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 5, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 5, html.vc = 2;
+        __vbuffer.push('<div class="buttons">');
+        html.vl = 5, html.vc = 23;
+        __vbuffer.push('\n');
+        html.vl = 6, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 6, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 6, html.vc = 2;
+        __vbuffer.push('<button class="button button-clear js-close">');
+        html.vl = 6, html.vc = 47;
+        __vbuffer.push('Close');
+        html.vl = 6, html.vc = 52;
+        __vbuffer.push('</button>');
+        html.vl = 6, html.vc = 61;
+        __vbuffer.push('\n');
+        html.vl = 7, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 7, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 7, html.vc = 2;
+        __vbuffer.push('</div>');
+        html.vl = 7, html.vc = 8;
+        __vbuffer.push('\n');
+        html.vl = 8, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 8, html.vc = 1;
+        __vbuffer.push('</ion-header-bar>');
+        html.vl = 8, html.vc = 18;
+        __vbuffer.push('\n');
+        html.vl = 9, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 9, html.vc = 1;
+        __vbuffer.push('<ion-content>');
+        html.vl = 9, html.vc = 14;
+        __vbuffer.push('\n');
+        html.vl = 10, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 10, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 10, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 10, html.vc = 3;
+        __vbuffer.push('\t');
+        html.vl = 10, html.vc = 4;
+        __vbuffer.push('<div class="modal-body">');
+        html.vl = 10, html.vc = 28;
+        __vbuffer.push('\n');
+        html.vl = 11, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 11, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 11, html.vc = 2;
+        __vbuffer.push('\t');
+        html.vl = 11, html.vc = 3;
+        __vbuffer.push('</div>');
+        html.vl = 11, html.vc = 9;
+        __vbuffer.push('\n');
+        html.vl = 12, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 12, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 12, html.vc = 2;
+        __vbuffer.push('\t');
+        html.vl = 12, html.vc = 3;
+        __vbuffer.push('<div class="list">');
+        html.vl = 12, html.vc = 21;
+        __vbuffer.push('\n');
+        html.vl = 13, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 13, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 13, html.vc = 2;
+        __vbuffer.push('\t');
+        html.vl = 13, html.vc = 3;
+        __vbuffer.push('<label class="item">');
+        html.vl = 13, html.vc = 23;
+        __vbuffer.push('\n');
+        html.vl = 14, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 14, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 14, html.vc = 2;
+        __vbuffer.push('\t');
+        html.vl = 14, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 14, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 14, html.vc = 5;
+        __vbuffer.push('<button class="js-close button button-block button-positive" type="button">');
+        html.vl = 14, html.vc = 80;
+        __vbuffer.push('Ok');
+        html.vl = 14, html.vc = 82;
+        __vbuffer.push('</button>');
+        html.vl = 14, html.vc = 91;
+        __vbuffer.push('\n');
+        html.vl = 15, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 15, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 15, html.vc = 2;
+        __vbuffer.push('\t');
+        html.vl = 15, html.vc = 3;
+        __vbuffer.push('</label>');
+        html.vl = 15, html.vc = 11;
+        __vbuffer.push('\n');
+        html.vl = 16, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 16, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 16, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 16, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 16, html.vc = 4;
+        __vbuffer.push('</div>');
+        html.vl = 16, html.vc = 10;
+        __vbuffer.push('\n');
+        html.vl = 17, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 17, html.vc = 1;
+        __vbuffer.push('</ion-content>');
+        html.vl = 17, html.vc = 15;
+        __vbuffer.push('\n');
+        html.vl = 18, html.vc = 0;
+        __vbuffer.push('</div>');
+        html.vl = 18, html.vc = 6;
+        __vbuffer.push('\n');
+        __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
+        return __vopts && __vopts.asContext ? html : html.toString();
+    } catch (e) {
+        html.reportError(e, html.vl, html.vc, '!LB!<div style="display:none" class="modal">!LB!\t<ion-header-bar>!LB!\t\t<h1 class="title">Labeled Flags</h1>!LB!\t\t<div class="buttons">!LB!\t\t<button class="button button-clear js-close">Close</button>!LB!\t\t</div>!LB!\t</ion-header-bar>!LB!\t<ion-content>!LB!\t\t \t<div class="modal-body">!LB!\t\t\t</div>!LB!\t\t\t<div class="list">!LB!\t\t\t<label class="item">!LB!\t\t\t  <button class="js-close button button-block button-positive" type="button">Ok</button>!LB!\t\t\t</label>!LB!\t\t  </div>!LB!\t</ion-content>!LB!</div>!LB!');
+    }
+}, {
+    'simple': false,
+    'modelName': 'model',
+    'helpersName': 'html'
+});
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],13:[function(require,module,exports){
+var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
+module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
+    try {
+        var __vbuffer = html.buffer;
+        html.options = __vopts;
+        model = model || {};
+        html.vl = 1, html.vc = 0;
+        __vbuffer.push('<div>');
+        html.vl = 1, html.vc = 5;
+        __vbuffer.push('\n');
+        html.vl = 2, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 2, html.vc = 1;
+        __vbuffer.push('<div class="input-label">');
+        html.vl = 2, html.vc = 26;
+        __vbuffer.push('\n');
+        html.vl = 3, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 3, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 3, html.vc = 2;
+        __vbuffer.push('Add');
+        html.vl = 3, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 3, html.vc = 6;
+        __vbuffer.push('a');
+        html.vl = 3, html.vc = 7;
+        __vbuffer.push(' ');
+        html.vl = 3, html.vc = 8;
+        __vbuffer.push('new');
+        html.vl = 3, html.vc = 11;
+        __vbuffer.push(' ');
+        html.vl = 3, html.vc = 12;
+        __vbuffer.push('record');
+        html.vl = 3, html.vc = 18;
+        __vbuffer.push('\n');
+        html.vl = 4, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 4, html.vc = 1;
+        __vbuffer.push('</div>');
+        html.vl = 4, html.vc = 7;
+        __vbuffer.push('\n');
+        html.vl = 5, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 5, html.vc = 1;
+        __vbuffer.push('<select>');
+        html.vl = 5, html.vc = 9;
+        __vbuffer.push('\n');
+        html.vl = 6, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 6, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 6, html.vc = 3;
+        __vbuffer.push(model.recordTypes.forEach(function (recordType) {
+            html.vl = 7, html.vc = 3;
+            __vbuffer.push('<option class="js-new-record">');
+            html.vl = 7, html.vc = 34;
+            __vbuffer.push(html.escape(recordType).toHtmlString());
+            html.vl = 7, html.vc = 34;
+            html.vl = 7, html.vc = 44;
+            __vbuffer.push('</option>');
+        }));
+        html.vl = 8, html.vc = 3;
+        html.vl = 8, html.vc = 4;
+        __vbuffer.push('\n');
+        html.vl = 9, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 9, html.vc = 1;
+        __vbuffer.push('</select>');
+        html.vl = 9, html.vc = 10;
+        __vbuffer.push('\n');
+        html.vl = 10, html.vc = 0;
+        __vbuffer.push('</div>');
+        html.vl = 10, html.vc = 6;
+        __vbuffer.push('\n');
+        html.vl = 11, html.vc = 0;
+        __vbuffer.push('\n');
+        __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
+        return __vopts && __vopts.asContext ? html : html.toString();
+    } catch (e) {
+        html.reportError(e, html.vl, html.vc, '<div>!LB!\t<div class="input-label">!LB!\t\tAdd a new record!LB!\t</div>!LB!\t<select>!LB!\t\t@model.recordTypes.forEach(function(recordType){!LB!\t\t\t<option class="js-new-record">@recordType</option>!LB!\t\t})!LB!\t</select>!LB!</div>!LB!!LB!');
+    }
+}, {
+    'simple': false,
+    'modelName': 'model',
+    'helpersName': 'html'
+});
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],14:[function(require,module,exports){
+var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
+module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
+    try {
+        var __vbuffer = html.buffer;
+        html.options = __vopts;
+        model = model || {};
+        html.vl = 1, html.vc = 0;
+        __vbuffer.push('<ul class="list">');
+        html.vl = 1, html.vc = 17;
+        __vbuffer.push('\n');
+        html.vl = 2, html.vc = 0;
+        __vbuffer.push('</ul>');
+        html.vl = 2, html.vc = 5;
+        __vbuffer.push('\n');
+        html.vl = 3, html.vc = 0;
+        __vbuffer.push('\n');
+        __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
+        return __vopts && __vopts.asContext ? html : html.toString();
+    } catch (e) {
+        html.reportError(e, html.vl, html.vc, '<ul class="list">!LB!</ul>!LB!!LB!');
+    }
+}, {
+    'simple': false,
+    'modelName': 'model',
+    'helpersName': 'html'
+});
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],15:[function(require,module,exports){
+var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
+module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
+    try {
+        var __vbuffer = html.buffer;
+        html.options = __vopts;
+        model = model || {};
+        html.vl = 1, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 1, html.vc = 1;
+        __vbuffer.push('<div class="item item-icon-right">');
+        html.vl = 1, html.vc = 35;
+        __vbuffer.push('\n');
+        html.vl = 2, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 2, html.vc = 2;
+        __vbuffer.push(html.escape(model.type).toHtmlString());
+        html.vl = 2, html.vc = 8;
+        html.vl = 2, html.vc = 12;
+        __vbuffer.push('\n');
+        html.vl = 3, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 3, html.vc = 1;
+        __vbuffer.push('<i class="js-delete icon assertive ion-close-circled">');
+        html.vl = 3, html.vc = 55;
+        __vbuffer.push('</i>');
+        html.vl = 3, html.vc = 59;
+        __vbuffer.push('\n');
+        html.vl = 4, html.vc = 0;
+        __vbuffer.push('</div>');
+        html.vl = 4, html.vc = 6;
+        __vbuffer.push('\n');
+        __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
+        return __vopts && __vopts.asContext ? html : html.toString();
+    } catch (e) {
+        html.reportError(e, html.vl, html.vc, ' <div class="item item-icon-right">!LB!\t@model.type!LB!\t<i class="js-delete icon assertive ion-close-circled"></i>!LB!</div>!LB!');
+    }
+}, {
+    'simple': false,
+    'modelName': 'model',
+    'helpersName': 'html'
+});
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],16:[function(require,module,exports){
 var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
@@ -8972,7 +8772,7 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],15:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],17:[function(require,module,exports){
 var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
@@ -9085,7 +8885,7 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],16:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],18:[function(require,module,exports){
 var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
@@ -9218,7 +9018,7 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":17}],17:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],19:[function(require,module,exports){
 /**
  * Vash - JavaScript Template Parser, v0.7.12-1
  *
@@ -9227,17 +9027,48 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
  * Copyright (c) 2013 Andrew Petersen
  * MIT License (LICENSE)
  */void 0,function(){function i(a,b){typeof b=="function"&&(b={onRenderEnd:b}),a&&a.onRenderEnd&&(b=b||{},b.onRenderEnd||(b.onRenderEnd=a.onRenderEnd),delete a.onRenderEnd),b||(b={});return b}vash=typeof vash=="undefined"?{}:vash,vash.compile||(typeof define=="function"&&define.amd?define(function(){return vash}):typeof module=="object"&&module.exports?module.exports=vash:window.vash=vash);var a=vash.helpers,b=function(a){this.buffer=new f,this.model=a,this.options=null,this.vl=0,this.vc=0};vash.helpers=a=b.prototype={constructor:b,config:{},tplcache:{}},a.toString=a.toHtmlString=function(){return this.buffer._vo.join("")};var c=/[&<>"'`]/g,d=function(a){return e[a]},e={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#x27;","`":"&#x60;"};a.raw=function(a){var b=function(){return a};a=a!=null?a:"";return{toHtmlString:b,toString:b}},a.escape=function(a){var b=function(){return a};a=a!=null?a:"";if(typeof a.toHtmlString!="function"){a=a.toString().replace(c,d);return{toHtmlString:b,toString:b}}return a};var f=function(){this._vo=[]};f.prototype.mark=function(a){var b=new g(this,a);b.markedIndex=this._vo.length,this._vo.push(b.uid);return b},f.prototype.fromMark=function(a){var b=a.findInBuffer();if(b>-1){a.destroy();return this._vo.splice(b,this._vo.length)}return[]},f.prototype.spliceMark=function(a,b,c){var d=a.findInBuffer();if(d>-1){a.destroy(),arguments[0]=d;return this._vo.splice.apply(this._vo,arguments)}return[]},f.prototype.empty=function(){return this._vo.splice(0,this._vo.length)},f.prototype.push=function(a){return this._vo.push(a)},f.prototype.pushConcat=function(a){var b;Array.isArray(a)?b=a:arguments.length>1?b=Array.prototype.slice.call(arguments):b=[a];for(var c=0;c<b.length;c++)this._vo.push(b[c]);return this.__vo},f.prototype.indexOf=function(a){for(var b=0;b<this._vo.length;b++)if(a.test&&this._vo[b]&&this._vo[b].search(a)>-1||this._vo[b]==a)return b;return-1},f.prototype.lastIndexOf=function(a){var b=this._vo.length;while(--b>=0)if(a.test&&this._vo[b]&&this._vo[b].search(a)>-1||this._vo[b]==a)return b;return-1},f.prototype.splice=function(){return this._vo.splice.apply(this._vo,arguments)},f.prototype.index=function(a){return this._vo[a]},f.prototype.flush=function(){return this.empty().join("")},f.prototype.toString=f.prototype.toHtmlString=function(){return this._vo.join("")};var g=vash.Mark=function(a,b){this.uid="[VASHMARK-"+~~(Math.random()*1e7)+(b?":"+b:"")+"]",this.markedIndex=0,this.buffer=a,this.destroyed=!1},h=g.re=/\[VASHMARK\-\d{1,8}(?::[\s\S]+?)?]/g;g.uidLike=function(a){return(a||"").search(h)>-1},g.prototype.destroy=function(){var a=this.findInBuffer();a>-1&&(this.buffer.splice(a,1),this.markedIndex=-1),this.destroyed=!0},g.prototype.findInBuffer=function(){if(this.destroyed)return-1;if(this.markedIndex&&this.buffer.index(this.markedIndex)===this.uid)return this.markedIndex;var a=this.uid.replace(/(\[|\])/g,"\\$1"),b=new RegExp(a);return this.markedIndex=this.buffer.indexOf(b)},a.constructor.reportError=function(a,b,c,d,e){e=e||"!LB!";var f=d.split(e),g=b===0&&c===0?f.length-1:3,h=Math.max(0,b-g),i=Math.min(f.length,b+g),j=f.slice(h,i).map(function(a,c,d){var e=c+h+1;return(e===b?"  > ":"    ")+(e<10?" ":"")+e+" | "+a}).join("\n");a.vashlineno=b,a.vashcharno=c,a.message="Problem while rendering template at line "+b+", character "+c+".\nOriginal message: "+a.message+"."+"\nContext: \n\n"+j+"\n\n";throw a},a.reportError=function(){this.constructor.reportError.apply(this,arguments)},vash.link=function(c,d){var e,f;d.args||(d.args=[d.modelName,d.helpersName,"__vopts","vash"]);if(typeof c=="string"){e=c;try{f=d.args.slice(),f.push(c),c=Function.apply(null,f)}catch(g){a.reportError(g,0,0,e,/\n/)}}c.options={simple:d.simple,modelName:d.modelName,helpersName:d.helpersName};var h;d.asHelper?(c.options.args=d.args,c.options.asHelper=d.asHelper,h=function(){return c.apply(this,j.call(arguments))},a[d.asHelper]=h):h=function(a,e){if(d.simple){var f={buffer:[],escape:b.prototype.escape,raw:b.prototype.raw};return c(a,f,e,vash)}e=i(a,e);return c(a,e&&e.context||new b(a),e,vash)},h.toString=function(){return c.toString()},h._toString=function(){return Function.prototype.toString.call(h)},h.toClientString=function(){return"vash.link( "+c.toString()+", "+JSON.stringify(c.options)+" )"};return h};var j=Array.prototype.slice;vash.lookup=function(a,b){var c=vash.helpers.tplcache[a];if(!c)throw new Error("Could not find template: "+a);return b?c(b):c},vash.install=function(a,b){var c=vash.helpers.tplcache;if(typeof b=="string"){if(!vash.compile)throw new Error("vash.install(path, [string]) is not available in the standalone runtime.");b=vash.compile(b)}else if(typeof a=="object"){b=a,Object.keys(b).forEach(function(a){c[a]=b[a]});return c}return c[a]=b},vash.uninstall=function(a){var b=vash.helpers.tplcache,c=!1;if(typeof a=="string")return delete b[a];Object.keys(b).forEach(function(d){b[d]===a&&(c=delete b[d])});return c}}(),function(){var a=vash.helpers;a.trim=function(a){return a.replace(/^\s*|\s*$/g,"")},a.config.highlighter=null,a.highlight=function(b,c){var d=this.buffer.mark();c();var e=this.buffer.fromMark(d);this.buffer.push("<pre><code>"),a.config.highlighter?this.buffer.push(a.config.highlighter(b,e.join("")).value):this.buffer.push(e),this.buffer.push("</code></pre>")}}(),function(){function d(a){var b=vash.Mark.re,c=[],d="";a.forEach(function(a){b.exec(a)?(c.push(d,a),d=""):d+=a||""}),c.push(d);return c}if(typeof window=="undefined")var a=require("fs"),b=require("path");var c=vash.helpers;c.config.browser=!1,vash.loadFile=function(d,e,f){e=vQuery.extend({},vash.config,e||{});var g=c.config.browser,h;!g&&e.settings&&e.settings.views&&(d=b.normalize(d),d.indexOf(b.normalize(e.settings.views))===-1&&(d=b.join(e.settings.views,d)),b.extname(d)||(d+="."+(e.settings["view engine"]||"vash")));try{h=e.cache||g?c.tplcache[d]||(c.tplcache[d]=vash.compile(a.readFileSync(d,"utf8"))):vash.compile(a.readFileSync(d,"utf8")),f&&f(null,h)}catch(i){f&&f(i,null)}},vash.renderFile=function(a,b,c){vash.loadFile(a,b,function(a,d){var e=b.onRenderEnd;c(a,!a&&d(b,function(a,b){b.finishLayout(),e&&e(a,b)}))})},c._ensureLayoutProps=function(){this.appends=this.appends||{},this.prepends=this.prepends||{},this.blocks=this.blocks||{},this.blockMarks=this.blockMarks||{}},c.finishLayout=function(){this._ensureLayoutProps();var a=this,b,c,e,f,g,h,i,j;for(b in this.blockMarks)c=this.blockMarks[b],f=this.prepends[b],e=this.blocks[b],g=this.appends[b],h=c.pop(),i=this.buffer.mark(),f&&f.forEach(function(b){a.buffer.pushConcat(b)}),block=e.pop(),block&&this.buffer.pushConcat(block),g&&g.forEach(function(b){a.buffer.pushConcat(b)}),j=this.buffer.fromMark(i),j=d(j),j.unshift(h,0),this.buffer.spliceMark.apply(this.buffer,j);for(b in this.blockMarks)this.blockMarks[b].forEach(function(a){a.destroy()});delete this.blockMarks,delete this.prepends,delete this.blocks,delete this.appends;return this.toString()},c.extend=function(a,b){var c=this,d=this.buffer,e=this.model,f;this._ensureLayoutProps(),vash.loadFile(a,this.model,function(a,d){var e=c.buffer.mark();b(c.model);var f=c.buffer.fromMark(e);c.isExtending=!0,d(c.model,{context:c}),c.isExtending=!1}),this.model=e},c.include=function(a,b){var c=this,d=this.buffer,e=this.model;vash.loadFile(a,this.model,function(a,d){d(b||c.model,{context:c})}),this.model=e},c.block=function(a,b){this._ensureLayoutProps();var c=this,d=this.blockMarks[a]||(this.blockMarks[a]=[]),e=this.blocks[a]||(this.blocks[a]=[]),f,g;b&&(f=this.buffer.mark(),b(this.model),g=this.buffer.fromMark(f),g.length&&!this.isExtending&&e.push(g),g.length&&this.isExtending&&e.unshift(g)),d.push(this.buffer.mark("block-"+a))},c._handlePrependAppend=function(a,b,c){this._ensureLayoutProps();var d=this.buffer.mark(),e,f=this[a],g=f[b]||(f[b]=[]);c(this.model),e=this.buffer.fromMark(d),g.push(e)},c.append=function(a,b){this._handlePrependAppend("appends",a,b)},c.prepend=function(a,b){this._handlePrependAppend("prepends",a,b)}}()
-},{"fs":2,"path":5}],18:[function(require,module,exports){
+},{"fs":2,"path":5}],20:[function(require,module,exports){
+var $ = window.$,
+	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/2_index.vash.js");
+
+
+function Modal(title, $content){
+	var $modal = $(template({title: title}));
+	$modal.find('h1.title').text(title);
+	$modal.find('.modal-body')
+		.empty()
+		.append($content);
+
+	$modal.find('.js-close')
+		.on('click', function(ev){
+			ev.preventDefault();
+			$modal.fadeOut(function(){
+				$modal.slideUp();
+			});
+		});
+
+	this.show = function(){
+		$modal.slideDown();
+		$('body').append($modal);
+	};
+}
+
+module.exports = Modal;
+
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/2_index.vash.js":12}],21:[function(require,module,exports){
+
 var $ = window.$,
 	_ = require('lodash'),
-	listTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/2_index.vash.js"),
-	itemTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/3_item.vash.js");
+	Modal = require('modal'),
+	listTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/4_index.vash.js"),
+	itemTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/5_item.vash.js");
 
 
 function RecordList(){
 	var self = this, 
 		items = [];
 
+	var modal;
 	this.$element = $(listTemplate({}));
 
 	this.add = function(record){
@@ -9250,27 +9081,24 @@ function RecordList(){
 				$item: $item,
 			};
 
+
 		$item.find('.js-delete')
-			.on('click', function(){
+			.on('click', function(ev){
+				ev.stopPropagation();
+
 				_.remove(items, item);
 				$item.fadeOut('fast', function(){
 					$item.remove();
 				});
 			});
 
-		$item.find('.js-edit')
-			.on('click', function(){
-				var $modal = self.$element.filter('.modal');
-				$modal.find('.modal-title').text(item.record.type);
-				$modal.find('.modal-body')
-					.empty()
-					.append(item.record.$element);
-
-				$modal.modal({show: true});
+		$item.on('click', function(){
+			modal = new Modal(item.record.type, item.record.$element);
+			modal.show();
 			});
 
 		items.push(item);
-		this.$element.find('tbody').append($item);
+		this.$element.filter('.list').append($item);
 	};
 
 
@@ -9285,11 +9113,11 @@ function RecordList(){
 
 module.exports = RecordList;
 
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/2_index.vash.js":12,"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/3_item.vash.js":13,"lodash":9}],19:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/4_index.vash.js":14,"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/5_item.vash.js":15,"lodash":9,"modal":20}],22:[function(require,module,exports){
 var $ = window.$,
 	util = require('util'),
 	EventEmitter = require('events').EventEmitter,
-	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/1_index.vash.js");
+	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/3_index.vash.js");
 
 
 function RecordSelector(params){
@@ -9301,12 +9129,11 @@ function RecordSelector(params){
 		}));
 
 	$(this.$element)
-		.find('.js-new-record')
-		.on('click', function(){
+		.find('select')
+		.on('change', function(){
 			var $this = $(this);
 
-			self.emit('new-record', $this.text());
-
+			self.emit('new-record', $this.val());
 		});
 
 }
@@ -9314,9 +9141,9 @@ function RecordSelector(params){
 util.inherits(RecordSelector, EventEmitter);
 module.exports = RecordSelector;
 
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/1_index.vash.js":11,"events":3,"util":8}],20:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/3_index.vash.js":13,"events":3,"util":8}],23:[function(require,module,exports){
 var $ = window.$,
-	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/4_index.vash.js");
+	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/6_index.vash.js");
 
 function RecordA(){
 
@@ -9338,9 +9165,9 @@ function RecordA(){
 
 module.exports = RecordA;
 
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/4_index.vash.js":14}],21:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/6_index.vash.js":16}],24:[function(require,module,exports){
 var $ = window.$,
-	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/5_index.vash.js");
+	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/7_index.vash.js");
 
 function RecordA(){
 
@@ -9360,9 +9187,9 @@ function RecordA(){
 
 module.exports = RecordA;
 
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/5_index.vash.js":15}],22:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/7_index.vash.js":17}],25:[function(require,module,exports){
 var $ = window.$,
-	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/6_index.vash.js");
+	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/8_index.vash.js");
 
 
 function RecordA(){
@@ -9398,11 +9225,11 @@ function RecordA(){
 
 module.exports = RecordA;
 
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/6_index.vash.js":16}],23:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/8_index.vash.js":18}],26:[function(require,module,exports){
 module.exports = [
 	{name: 'Labeled Flags', ctor: require('./a/') },
 	{name: 'Name and Age', ctor: require('./b/') },
 	{name: 'Current Location', ctor: require('./c/') },
 ];
 
-},{"./a/":20,"./b/":21,"./c/":22}]},{},[1]);
+},{"./a/":23,"./b/":24,"./c/":25}]},{},[1]);
