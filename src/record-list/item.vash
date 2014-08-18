@@ -1,12 +1,12 @@
-<tr>
+ <tr>
 	<td>
 		<strong>@model.type</strong>
 	</td>
 	<td>
 	</td>
 	<td class="text-right">
-		<button class="js-edit btn btn-primary">Edit</button>
-		&nbsp;
-		<button class="js-delete btn btn-danger">Remove</button>
+		<button type="button" class="js-delete btn btn-danger btn-lg">
+			<span class="glyphicon glyphicon-remove"></span>
+		  </button>
 	</td>
 </tr>

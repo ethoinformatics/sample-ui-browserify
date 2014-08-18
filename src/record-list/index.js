@@ -1,3 +1,4 @@
+
 var $ = window.$,
 	_ = require('lodash'),
 	listTemplate = require('./index.vash'),
@@ -21,15 +22,16 @@ function RecordList(){
 			};
 
 		$item.find('.js-delete')
-			.on('click', function(){
+			.on('click', function(ev){
+				ev.stopPropagation();
+
 				_.remove(items, item);
 				$item.fadeOut('fast', function(){
 					$item.remove();
 				});
 			});
 
-		$item.find('.js-edit')
-			.on('click', function(){
+		$item.on('click', function(){
 				var $modal = self.$element.filter('.modal');
 				$modal.find('.modal-title').text(item.record.type);
 				$modal.find('.modal-body')

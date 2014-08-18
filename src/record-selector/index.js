@@ -18,7 +18,6 @@ function RecordSelector(params){
 			var $this = $(this);
 
 			self.emit('new-record', $this.text());
-
 		});
 
 }

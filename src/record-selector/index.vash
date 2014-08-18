@@ -3,13 +3,15 @@
 	<p>Select a new record type to add.</p>
 
 	<div class="dropdown">
-		<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+		<button class="btn btn-lg btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
 			Add a new record
 			<span class="caret"></span>
 		</button>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
 			@model.recordTypes.forEach(function(recordType){
-				<li role="presentation"><a role="menuitem" tabindex="-1" class="js-new-record" href="#">@recordType</a></li>
+				<li>
+					<button class="js-new-record btn btn-block btn-default btn-lg">@recordType</button>
+				</li>
 			})
 		</ul>
 	</div>
