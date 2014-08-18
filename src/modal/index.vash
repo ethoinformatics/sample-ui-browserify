@@ -4,13 +4,13 @@
 	  <h1 class="title">bar-energized</h1>
 	  <button class="js-close button icon ion-close"></button>
 	</div>
-	<ion-content>
-		 	<div style="position:relative;" class="has-header modal-body">
+	<div class="content has-header">
+		 	<div class="modal-body">
 			</div>
 			<div class="list">
 			<label class="item">
 			  <button class="js-close button button-block button-positive" type="button">Ok</button>
 			</label>
 		  </div>
-	</ion-content>
+	</div>
 </div>
