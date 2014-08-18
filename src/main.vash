@@ -7,9 +7,12 @@
 		<ul class="list">
 			<li id="select-container" class="item item-input item-select">
 			</li>
-		</ul>
-		<ul id="list-container" class="list">
+			<li class="item item-divider">
+				Records
+			</li>
+			<li id="list-container" class="list">
 
+			</li>
 		</ul>
 	</div>
 
