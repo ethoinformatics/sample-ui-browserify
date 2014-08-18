@@ -1,10 +1,16 @@
 <form role="form">
-  <div class="form-group">
-    <label>Name</label>
-    <input type="text" class="js-name form-control" placeholder="Name">
-  </div>
-  <div class="form-group">
-    <label>Age</label>
-    <input type="number" min="0" max="100" class="js-age form-control" placeholder="Age">
-  </div>
+	<ul class="list">
+		<li class="item item-input">
+			<label>
+			  <span class="input-label">Name</span>
+			  <input type="text" class="js-name">
+			</label>
+		</li>
+		<li class="item item-input">
+			<label>
+			  <span class="input-label">Age</span>
+			  <input type="number" class="js-age">
+			</label>
+		</li>
+	</ul>
 </form>
