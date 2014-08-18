@@ -13,13 +13,14 @@ function Modal(title, $content){
 		.on('click', function(ev){
 			ev.preventDefault();
 			$modal.fadeOut(function(){
-				$modal.slideUp();
+				$modal.remove();
 			});
 		});
 
 	this.show = function(){
-		$modal.slideDown();
 		$('body').append($modal);
+
+		$modal.fadeIn();
 	};
 }
 
