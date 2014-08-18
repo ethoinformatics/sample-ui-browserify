@@ -1,16 +1,29 @@
 <form role="form">
-  <div class="form-group">
-    <label>Label</label>
-    <input class="js-label" type="text" class="form-control" placeholder="Label">
-  </div>
-  <div class="checkbox">
-    <label>
-      <input class="js-flag-a" type="checkbox"> Flag A
-    </label>
-  </div>
-  <div class="checkbox">
-    <label>
-      <input class="js-flag-b" type="checkbox"> Flag B
-    </label>
-  </div>
+	<ul class="list">
+
+		<li class="item item-input">
+			<label>
+			  <span class="input-label">Name</span>
+			  <input type="text" class="js-label" >
+			</label>
+		</li>
+		<li class="item item-toggle">
+			A
+			<label class="toggle toggle-balanced">
+				<input class="js-flag-a" type="checkbox">
+					<div class="track">
+						<div class="handle"></div>
+					</div>
+			</label>
+		</li>
+		<li class="item item-toggle">
+			B
+			<label class="toggle toggle-balanced">
+				<input class="js-flag-b" type="checkbox">
+					<div class="track">
+						<div class="handle"></div>
+					</div>
+			</label>
+		</li>
+	</ul>
 </form>

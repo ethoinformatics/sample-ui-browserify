@@ -16,8 +16,11 @@ function RecordSelector(params){
 		.find('select')
 		.on('change', function(){
 			var $this = $(this);
+			var v = $this.val();
+			if (/select/i.test(v)) return;
 
-			self.emit('new-record', $this.val());
+			self.emit('new-record', v);
+			$this.val('Select');
 		});
 
 }

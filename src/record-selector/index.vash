@@ -3,6 +3,7 @@
 		Add a new record
 	</div>
 	<select>
+		<option>Select</option>
 		@model.recordTypes.forEach(function(recordType){
 			<option class="js-new-record">@recordType</option>
 		})
