@@ -4,9 +4,7 @@ var $ = window.$,
 	recordTypes = require('./record-types'),
 	RecordSelector = require('./record-selector'),
 	RecordList = require('./record-list'),
-	Modal = require('modal'),
-	resultsTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/0_results.vash.js"),
-	mainTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/1_main.vash.js");
+	mainTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/0_main.vash.js");
 
 $(function(){
 	var $body = $('body'),
@@ -32,9 +30,9 @@ $(function(){
 
 		$btnSave.on('click', function(){
 			var data = recordList.getData();
-			var modal = new Modal('Results', resultsTemplate(data));
-
-			modal.show();
+			$body.find('pre#results')
+				.text(JSON.stringify(data, null, "\t"))
+				.fadeIn();
 		});
 });
 
@@ -42,7 +40,7 @@ $(function(){
 
 
 
-},{"./record-list":21,"./record-selector":22,"./record-types":26,"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/0_results.vash.js":10,"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/1_main.vash.js":11,"lodash":9,"modal":20}],2:[function(require,module,exports){
+},{"./record-list":38,"./record-selector":39,"./record-types":43,"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/0_main.vash.js":30,"lodash":9}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
@@ -8054,37 +8052,2034 @@ function hasOwnProperty(obj, prop) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],10:[function(require,module,exports){
-var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
-module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
-    try {
-        var __vbuffer = html.buffer;
-        html.options = __vopts;
-        model = model || {};
-        {
-            var r = JSON.stringify(model, null, '\t');
-        }
-        html.vl = 1, html.vc = 46;
-        __vbuffer.push('\n');
-        html.vl = 2, html.vc = 0;
-        __vbuffer.push('<pre>');
-        html.vl = 2, html.vc = 6;
-        __vbuffer.push(html.escape(r).toHtmlString());
-        html.vl = 2, html.vc = 6;
-        html.vl = 2, html.vc = 7;
-        __vbuffer.push('</pre>');
-        html.vl = 2, html.vc = 13;
-        __vbuffer.push('\n');
-        __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
-        return __vopts && __vopts.asContext ? html : html.toString();
-    } catch (e) {
-        html.reportError(e, html.vl, html.vc, '@{var r = JSON.stringify(model, null, "\t"); }!LB!<pre>@r</pre>!LB!');
+
+function Adapter(obj) {
+  if (!(this instanceof Adapter)) {
+    return new Adapter(obj);
+  }
+
+  var self = this;
+  self.obj = obj;
+};
+
+/**
+ * Default subscription method.
+ * Subscribe to changes on the model.
+ *
+ * @param {Object} obj
+ * @param {String} prop
+ * @param {Function} fn
+ */
+
+Adapter.prototype.subscribe = function(prop, fn) {
+};
+
+/**
+ * Default unsubscription method.
+ * Unsubscribe from changes on the model.
+ */
+
+Adapter.prototype.unsubscribe = function(prop, fn) {
+};
+
+/**
+ * Remove all subscriptions on this adapter
+ */
+
+Adapter.prototype.unsubscribeAll = function() {
+};
+
+/**
+ * Default setter method.
+ * Set a property on the model.
+ *
+ * @param {Object} obj
+ * @param {String} prop
+ * @param {Mixed} val
+ */
+
+Adapter.prototype.set = function(prop, val) {
+  var obj = this.obj;
+  if (!obj) return;
+  if ('function' == typeof obj[prop]) {
+    obj[prop](val);
+  }
+  else if ('function' == typeof obj.set) {
+    obj.set(prop, val);
+  }
+  else {
+    obj[prop] = val;
+  }
+};
+
+/**
+ * Default getter method.
+ * Get a property from the model.
+ *
+ * @param {Object} obj
+ * @param {String} prop
+ * @return {Mixed}
+ */
+
+Adapter.prototype.get = function(prop) {
+  var obj = this.obj;
+  if (!obj) {
+    return undefined;
+  }
+
+  // split property on '.' access
+  // and dig into the object
+  var parts = prop.split('.');
+  var part = parts.shift();
+  do {
+    if (typeof obj[part] === 'function') {
+      obj = obj[part].call(obj);
     }
-}, {
-    'simple': false,
-    'modelName': 'model',
-    'helpersName': 'html'
-});
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],11:[function(require,module,exports){
+    else {
+      obj = obj[part];
+    }
+
+    if (!obj) {
+      return undefined;
+    }
+
+    part = parts.shift();
+  } while(part);
+
+  return obj;
+};
+
+module.exports = Adapter;
+
+},{}],11:[function(require,module,exports){
+
+/**
+ * Module dependencies.
+ */
+
+var debug = require('debug')('reactive:attr-binding');
+var utils = require('./utils');
+
+/**
+ * Expose `AttrBinding`.
+ */
+
+module.exports = AttrBinding;
+
+/**
+ * Initialize a new attribute binding.
+ *
+ * @param {Reactive} view
+ * @param {Element} node
+ * @param {Attribute} attr
+ * @api private
+ */
+
+function AttrBinding(reactive, node, attr) {
+  var self = this;
+  this.reactive = reactive;
+  this.node = node;
+  this.attr = attr;
+  this.text = attr.value;
+  this.props = utils.interpolationProps(this.text);
+  this.subscribe();
+  this.render();
+}
+
+/**
+ * Subscribe to changes.
+ */
+
+AttrBinding.prototype.subscribe = function(){
+  var self = this;
+  var reactive = this.reactive;
+  this.props.forEach(function(prop){
+    reactive.sub(prop, function(){
+      self.render();
+    });
+  });
+};
+
+/**
+ * Render the value.
+ */
+
+AttrBinding.prototype.render = function(){
+  var attr = this.attr;
+  var text = this.text;
+  var reactive = this.reactive;
+  var model = reactive.model;
+
+  // TODO: delegate most of this to `Reactive`
+  debug('render %s "%s"', attr.name, text);
+  attr.value = utils.interpolate(text, function(prop, fn){
+    if (fn) {
+      return fn(reactive);
+    } else {
+      return reactive.get(prop);
+    }
+  });
+};
+
+},{"./utils":17,"debug":25}],12:[function(require,module,exports){
+var hasInterpolation = require('./utils').hasInterpolation;
+var interpolationProps = require('./utils').interpolationProps;
+
+/**
+ * Expose `Binding`.
+ */
+
+module.exports = Binding;
+
+/**
+ * Initialize a binding.
+ *
+ * @api private
+ */
+
+function Binding(name, reactive, el, fn) {
+  this.name = name;
+  this.reactive = reactive;
+  this.model = reactive.model;
+  this.view = reactive.view;
+  this.el = el;
+  this.fn = fn;
+}
+
+/**
+ * Apply the binding.
+ *
+ * @api private
+ */
+
+Binding.prototype.bind = function() {
+  var val = this.el.getAttribute(this.name);
+  this.fn(this.el, val, this.model);
+};
+
+/**
+ * Perform interpolation on `name`.
+ *
+ * @param {String} name
+ * @return {String}
+ * @api public
+ */
+
+Binding.prototype.interpolate = function(name) {
+  var self = this;
+
+  if (~name.indexOf('{')) {
+    return name.replace(/{([^}]+)}/g, function(_, name){
+      return self.value(name);
+    });
+  }
+
+  return self.value(name);
+};
+
+/**
+ * Return value for property `name`.
+ *
+ *  - check if the "view" has a `name` method
+ *  - check if the "model" has a `name` method
+ *  - check if the "model" has a `name` property
+ *
+ * @param {String} name
+ * @return {Mixed}
+ * @api public
+ */
+
+Binding.prototype.value = function(name) {
+  return this.reactive.get(name);
+};
+
+/**
+ * Invoke `fn` on changes.
+ *
+ * @param {Function} fn
+ * @api public
+ */
+
+Binding.prototype.change = function(fn) {
+  fn.call(this);
+
+  var self = this;
+  var reactive = this.reactive;
+  var val = this.el.getAttribute(this.name);
+
+  // interpolation
+  if (hasInterpolation(val)) {
+    var props = interpolationProps(val);
+    props.forEach(function(prop){
+      reactive.sub(prop, fn.bind(self));
+    });
+    return;
+  }
+
+  // bind to prop
+  var prop = val;
+  reactive.sub(prop, fn.bind(this));
+};
+
+},{"./utils":17}],13:[function(require,module,exports){
+/**
+ * Module dependencies.
+ */
+
+var carry = require('carry');
+var classes = require('classes');
+var event = require('event');
+
+var each_binding = require('./each');
+
+/**
+ * Attributes supported.
+ */
+
+var attrs = [
+  'id',
+  'src',
+  'rel',
+  'cols',
+  'rows',
+  'name',
+  'href',
+  'title',
+  'class',
+  'style',
+  'width',
+  'value',
+  'height',
+  'tabindex',
+  'placeholder'
+];
+
+/**
+ * Events supported.
+ */
+
+var events = [
+  'change',
+  'click',
+  'dblclick',
+  'mousedown',
+  'mouseup',
+  'mouseenter',
+  'mouseleave',
+  'scroll',
+  'blur',
+  'focus',
+  'input',
+  'submit',
+  'keydown',
+  'keypress',
+  'keyup'
+];
+
+/**
+ * Apply bindings.
+ */
+
+module.exports = function(reactive){
+
+  reactive.bind('each', each_binding);
+
+  /**
+   * Generate attribute bindings.
+   */
+
+  attrs.forEach(function(attr){
+    reactive.bind('data-' + attr, function(el, name, obj){
+      var change = function () {
+        el.setAttribute(attr, this.interpolate(name));
+      };
+
+      if (!!~['INPUT', 'TEXTAREA'].indexOf(el.tagName) && attr === 'value') {
+        change = function () {
+          el.value = this.interpolate(name);
+        };
+      }
+
+      this.change(change);
+    });
+  });
+
+  /**
+   * Show binding.
+   */
+
+  reactive.bind('data-visible', function(el, name){
+    this.change(function(){
+      var val = this.value(name);
+      if (val) {
+        classes(el).add('visible').remove('hidden');
+      } else {
+        classes(el).remove('visible').add('hidden');
+      }
+    });
+  });
+
+  /**
+   * Hide binding.
+   */
+
+  reactive.bind('data-hidden', function(el, name){
+    this.change(function(){
+      var val = this.value(name);
+      if (val) {
+        classes(el).remove('visible').add('hidden');
+      } else {
+        classes(el).add('visible').remove('hidden');
+      }
+    });
+  });
+
+  /**
+   * Checked binding.
+   */
+
+  reactive.bind('data-checked', function(el, name){
+    this.change(function(){
+      if (this.value(name)) {
+        el.setAttribute('checked', 'checked');
+      } else {
+        el.removeAttribute('checked');
+      }
+    });
+  });
+
+  /**
+   * Selected binding.
+   */
+
+  reactive.bind('data-selected', function(el, name){
+    this.change(function(){
+      if (this.value(name)) {
+        el.setAttribute('selected', 'selected');
+      } else {
+        el.removeAttribute('selected');
+      }
+    });
+  });
+
+  /**
+   * Text binding.
+   */
+
+  reactive.bind('data-text', function(el, name){
+    var change = function () {
+      el.textContent = this.interpolate(name);
+    };
+
+    if (el.tagName === 'TEXTAREA') {
+      change = function () {
+        el.value = this.interpolate(name);
+      };
+    }
+
+    this.change(change);
+  });
+
+  /**
+   * HTML binding.
+   */
+
+  reactive.bind('data-html', function(el, name){
+    this.change(function(){
+      el.innerHTML = this.interpolate(name);
+    });
+  });
+
+  /**
+   * Generate event bindings.
+   */
+
+  events.forEach(function(name){
+    reactive.bind('on-' + name, function(el, method){
+      var self = this;
+      var view = self.reactive.view;
+      event.bind(el, name, function(e){
+        e.preventDefault();
+
+        var fn = view[method];
+        if (!fn) throw new Error('method .' + method + '() missing');
+        fn.call(view, e, self.reactive);
+      });
+    });
+  });
+
+  /**
+   * Append child element.
+   */
+
+  reactive.bind('data-append', function(el, name){
+    var other = this.value(name);
+    el.appendChild(other);
+  });
+
+  /**
+   * Replace element, carrying over its attributes.
+   */
+
+  reactive.bind('data-replace', function(el, name){
+    var other = carry(this.value(name), el);
+    el.parentNode.replaceChild(other, el);
+  });
+};
+
+},{"./each":14,"carry":19,"classes":23,"event":28}],14:[function(require,module,exports){
+// 'each' binding
+module.exports = function(el, val) {
+    var self = this;
+
+    // get the reactive constructor from the current reactive instance
+    // TODO(shtylman) port over adapter and bindings from instance?
+    var Reactive = self.reactive.constructor;
+
+    var val = val.split(/ +/);
+    el.removeAttribute('each');
+
+    var name = val[0];
+    var prop = val[0];
+
+    if (val.length > 1) {
+        name = val[0];
+        prop = val[2];
+    }
+
+    var parent = el.parentNode;
+
+    // use text node to hold where end of list should be
+    var placeholder = document.createTextNode('');
+    parent.insertBefore(placeholder, el);
+    parent.removeChild(el);
+
+    // the reactive views we created for our array
+    // one per array item
+    // the length of this MUST always match the length of the 'arr'
+    // and mutates with 'arr'
+    var views = [];
+
+    function childView(el, model) {
+        return Reactive(el, model, {
+            delegate: self.view,
+            adapter: self.reactive.opt.adapter,
+            bindings: self.reactive.bindings
+        });
+    }
+
+    var array;
+
+    // bind entire new array
+    function change(arr) {
+        // remove any old bindings/views
+        views.forEach(function(view) {
+            view.destroy();
+        });
+        views = [];
+
+        // remove any old array observers
+        if (array) {
+            unpatchArray(array);
+        }
+        patchArray(arr);
+        array = arr;
+
+        // handle initial array
+        var fragment = document.createDocumentFragment();
+        arr.forEach(function(obj) {
+            var clone = el.cloneNode(true);
+            var view = childView(clone, obj);
+            views.push(view);
+            fragment.appendChild(clone);
+        });
+        parent.insertBefore(fragment, placeholder);
+    }
+
+    function unpatchArray(arr) {
+        delete arr.splice;
+        delete arr.push;
+        delete arr.unshift;
+    }
+
+    function patchArray(arr) {
+        // splice will replace the current arr.splice function
+        // so that we can intercept modifications
+        var old_splice = arr.splice;
+        // idx -> index to start operation
+        // how many -> elements to remove
+        // ... elements to insert
+        // return removed elements
+        var splice = function(idx, how_many) {
+            var args = Array.prototype.slice.apply(arguments);
+
+            // new items to insert if any
+            var new_items = args.slice(2);
+
+            var place = placeholder;
+            if (idx < views.length) {
+                place = views[idx].el;
+            }
+
+            // make views for these items
+            var new_views = new_items.map(function(item) {
+                var clone = el.cloneNode(true);
+                return childView(clone, item);
+            });
+
+            var splice_args = [idx, how_many].concat(new_views);
+
+            var removed = views.splice.apply(views, splice_args);
+
+            var frag = document.createDocumentFragment();
+            // insert into appropriate place
+            // first removed item is where to insert
+            new_views.forEach(function(view) {
+                frag.appendChild(view.el);
+            });
+
+            // insert before a specific location
+            // the location is defined by the element at idx
+            parent.insertBefore(frag, place);
+
+            // remove after since we may need the element for 'placement'
+            // of the new document fragment
+            removed.forEach(function(view) {
+                view.destroy();
+            });
+
+            var ret = old_splice.apply(arr, args);
+
+            // set the length property of the array
+            // so that any listeners can pick up on it
+            self.reactive.set(prop + '.length', arr.length);
+            return ret;
+        };
+
+        /// existing methods can be implemented via splice
+
+        var push = function(el1, el2) {
+            var args = Array.prototype.slice.apply(arguments);
+            var len = arr.length;
+
+            var splice_args = [len, 0].concat(args)
+            splice.apply(arr, splice_args);
+            return arr.length;
+        };
+
+        var unshift = function(el1, el2) {
+            var args = Array.prototype.slice.apply(arguments);
+            var len = arr.length;
+
+            var splice_args = [0, 0].concat(args)
+            splice.apply(arr, splice_args);
+            return arr.length;
+        };
+
+        var pop = function() {
+            if (!arr.length) {
+                return void 0;
+            }
+            var element = arr[arr.length-1];
+            splice.apply(arr,[arr.length-1,1]);
+            return element;
+        };
+
+        var shift = function() {
+            if (!arr.length) {
+                return void 0;
+            }
+            var element = arr[0];
+            splice.apply(arr,[0,1]);
+            return element;
+        };
+
+        var sort = function () {
+            var ret = Array.prototype.sort.apply(arr,arguments);
+            var arr2 = [0,arr.length].concat(arr);
+            splice.apply(arr,arr2);
+            return ret;
+        };
+
+        var reverse = function() {
+            var ret = Array.prototype.reverse.apply(arr);
+            var arr2 = [0,arr.length].concat(arr);
+            splice.apply(arr,arr2);
+            return ret;
+        };
+
+        // use defineProperty to avoid making ownProperty fields
+        function set_prop(prop, fn) {
+            Object.defineProperty(arr, prop, {
+                enumerable: false,
+                writable: true,
+                configurable: true,
+                value: fn
+            });
+        }
+
+        set_prop('splice', splice);
+        set_prop('push', push);
+        set_prop('unshift', unshift);
+        set_prop('pop', pop);
+        set_prop('shift', shift);
+        set_prop('sort', sort);
+        set_prop('reverse', reverse);
+    }
+
+    change(self.reactive.get(prop) || []);
+    self.skip = true;
+
+    self.reactive.sub(prop, change);
+};
+
+
+},{}],15:[function(require,module,exports){
+/**
+ * Module dependencies.
+ */
+
+var Emitter = require('emitter');
+var query = require('query');
+var domify = require('domify');
+var debug = require('debug')('reactive');
+
+var Adapter = require('./adapter');
+var AttrBinding = require('./attr-binding');
+var TextBinding = require('./text-binding');
+var bindings = require('./bindings');
+var Binding = require('./binding');
+var utils = require('./utils');
+var walk = require('./walk');
+
+/**
+ * Expose `Reactive`.
+ */
+
+exports = module.exports = Reactive;
+
+/**
+ * Initialize a reactive template for `el` and `obj`.
+ *
+ * @param {Element} el
+ * @param {Element} obj
+ * @param {Object} options
+ * @api public
+ */
+
+function Reactive(el, model, opt) {
+  if (!(this instanceof Reactive)) return new Reactive(el, model, opt);
+  opt = opt || {};
+
+  if (typeof el === 'string') {
+    el = domify(el);
+  }
+
+  var self = this;
+  self.opt = opt || {};
+  self.model = model || {};
+  self.adapter = (opt.adapter || Adapter)(self.model);
+  self.el = el;
+  self.view = opt.delegate || Object.create(null);
+
+  self.bindings = opt.bindings || Object.create(null);
+
+  // TODO undo this crap and just export bindings regularly
+  // not that binding order matters!!
+  bindings({
+    bind: function(name, fn) {
+      self.bindings[name] = fn;
+    }
+  });
+
+  self._bind(this.el, []);
+}
+
+Emitter(Reactive.prototype);
+
+/**
+ * Subscribe to changes on `prop`.
+ *
+ * @param {String} prop
+ * @param {Function} fn
+ * @return {Reactive}
+ * @api private
+ */
+
+Reactive.prototype.sub = function(prop, fn){
+  var self = this;
+
+  debug('subscribe %s', prop);
+
+  // if we have parts, we need to subscribe to the parent as well
+  // TODO (defunctzombie) multiple levels of properties
+  var parts = prop.split('.');
+  if (parts.length > 1) {
+    self.sub(parts[0], function() {
+      // use self.get(prop) here because we wanted the value of the nested
+      // property but the subscription is for the parent
+      fn(self.get(prop));
+    });
+  }
+
+  // for when reactive changes the property
+  self.on('change ' + prop, fn);
+
+  // for when the property changed within the adapter
+  self.adapter.subscribe(prop, function() {
+    // skip items set internally from calling function twice
+    if (self._internal_set) return;
+
+    fn.apply(this, arguments);
+  });
+
+  return self;
+};
+
+/**
+ * Unsubscribe to changes from `prop`.
+ *
+ * @param {String} prop
+ * @param {Function} fn
+ * @return {Reactive}
+ * @api private
+ */
+
+Reactive.prototype.unsub = function(prop, fn){
+  this.off('change ' + prop, fn);
+  this.adapter.unsubscribe(prop, fn);
+
+  return this;
+};
+
+/**
+ * Get a `prop`
+ *
+ * @param {String} prop
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api private
+ */
+
+Reactive.prototype.get = function(prop) {
+  if (prop === 'this') {
+    return this.model;
+  }
+
+  // model takes precedence
+  var modelVal = this.adapter.get(prop);
+  if (modelVal) {
+    return modelVal;
+  }
+
+  var view = this.view;
+  var viewVal = view[prop];
+  if ('function' == typeof viewVal) {
+    return viewVal.call(view);
+  }
+  else if (viewVal) {
+    return viewVal;
+  }
+
+  return undefined;
+};
+
+/**
+ * Set a `prop`
+ *
+ * @param {String} prop
+ * @param {Mixed} val
+ * @return {Reactive}
+ * @api private
+ */
+
+Reactive.prototype.set = function(prop, val) {
+  var self = this;
+  // internal set flag lets reactive updates know to avoid triggering
+  // updates for the Adapter#set call
+  // we will already trigger updates with the change event
+  self._internal_set = true;
+  if( "object" == typeof prop) {
+    Object.keys(prop).forEach(function(name){
+      self.set(name, prop[name]);
+    });
+  }
+  else {
+    self.adapter.set(prop, val);
+    self.emit('change ' + prop, val);
+  }
+  self._internal_set = false;
+  return self;
+};
+
+/**
+ * Traverse and bind all interpolation within attributes and text.
+ *
+ * @param {Element} el
+ * @api private
+ */
+
+Reactive.prototype.bindInterpolation = function(el, els){
+
+  // element
+  if (el.nodeType == 1) {
+    for (var i = 0; i < el.attributes.length; i++) {
+      var attr = el.attributes[i];
+      if (utils.hasInterpolation(attr.value)) {
+        new AttrBinding(this, el, attr);
+      }
+    }
+  }
+
+  // text node
+  if (el.nodeType == 3) {
+    if (utils.hasInterpolation(el.data)) {
+      debug('bind text "%s"', el.data);
+      new TextBinding(this, el);
+    }
+  }
+
+  // walk nodes
+  for (var i = 0; i < el.childNodes.length; i++) {
+    var node = el.childNodes[i];
+    this.bindInterpolation(node, els);
+  }
+};
+
+Reactive.prototype._bind = function() {
+  var self = this;
+
+  var bindings = self.bindings;
+
+  walk(self.el, function(el, next) {
+    // element
+    if (el.nodeType == 1) {
+      var skip = false;
+
+      var attrs = {};
+      for (var i = 0; i < el.attributes.length; ++i) {
+        var attr = el.attributes[i];
+        var name = attr.name;
+        attrs[name] = attr;
+      }
+
+      // bindings must be iterated first
+      // to see if any request skipping
+      // only then can we see about attributes
+      Object.keys(bindings).forEach(function(name) {
+        if (!attrs[name] || skip) {
+          return;
+        }
+
+        debug('bind [%s]', name);
+
+        var prop = attrs[name].value;
+        var binding_fn = bindings[name];
+        if (!binding_fn) {
+          return;
+        }
+
+        var binding = new Binding(name, self, el, binding_fn);
+        binding.bind();
+        if (binding.skip) {
+          skip = true;
+        }
+      });
+
+      if (skip) {
+        return next(skip);
+      }
+
+      // if we are not skipping
+      // bind any interpolation attrs
+      for (var i = 0; i < el.attributes.length; ++i) {
+        var attr = el.attributes[i];
+        var name = attr.name;
+        if (utils.hasInterpolation(attr.value)) {
+          new AttrBinding(self, el, attr);
+        }
+      }
+
+      return next(skip);
+    }
+    // text
+    else if (el.nodeType == 3) {
+      if (utils.hasInterpolation(el.data)) {
+        debug('bind text "%s"', el.data);
+        new TextBinding(self, el);
+      }
+    }
+
+    next();
+  });
+};
+
+/**
+ * Bind `name` to `fn`.
+ *
+ * @param {String|Object} name or object
+ * @param {Function} fn
+ * @api public
+ */
+
+Reactive.prototype.bind = function(name, fn) {
+  var self = this;
+  if ('object' == typeof name) {
+    for (var key in name) {
+      this.bind(key, name[key]);
+    }
+    return;
+  }
+
+  var els = query.all('[' + name + ']', this.el);
+  if (this.el.hasAttribute && this.el.hasAttribute(name)) {
+    els = [].slice.call(els);
+    els.unshift(this.el);
+  }
+  if (!els.length) return;
+
+  debug('bind [%s] (%d elements)', name, els.length);
+  for (var i = 0; i < els.length; i++) {
+    var binding = new Binding(name, this, els[i], fn);
+    binding.bind();
+  }
+};
+
+/**
+ * Destroy the binding
+ * - Removes the element from the dom (if inserted)
+ * - unbinds any event listeners
+ *
+ * @api public
+ */
+
+Reactive.prototype.destroy = function() {
+  var self = this;
+
+  if (self.el.parentNode) {
+    self.el.parentNode.removeChild(self.el);
+  }
+
+  self.adapter.unsubscribeAll();
+  self.emit('destroyed');
+  self.removeAllListeners();
+};
+
+/**
+ * Use middleware
+ *
+ * @api public
+ */
+
+Reactive.prototype.use = function(fn) {
+  fn(this);
+  return this;
+};
+
+},{"./adapter":10,"./attr-binding":11,"./binding":12,"./bindings":13,"./text-binding":16,"./utils":17,"./walk":18,"debug":25,"domify":26,"emitter":27,"query":29}],16:[function(require,module,exports){
+
+/**
+ * Module dependencies.
+ */
+
+var debug = require('debug')('reactive:text-binding');
+var utils = require('./utils');
+
+/**
+ * Expose `TextBinding`.
+ */
+
+module.exports = TextBinding;
+
+/**
+ * Initialize a new text binding.
+ *
+ * @param {Reactive} view
+ * @param {Element} node
+ * @param {Attribute} attr
+ * @api private
+ */
+
+function TextBinding(reactive, node) {
+  this.reactive = reactive;
+  this.text = node.data;
+  this.node = node;
+  this.props = utils.interpolationProps(this.text);
+  this.subscribe();
+  this.render();
+}
+
+/**
+ * Subscribe to changes.
+ */
+
+TextBinding.prototype.subscribe = function(){
+  var self = this;
+  var reactive = this.reactive;
+  this.props.forEach(function(prop){
+    reactive.sub(prop, function(){
+      self.render();
+    });
+  });
+};
+
+/**
+ * Render text.
+ */
+
+TextBinding.prototype.render = function(){
+  var node = this.node;
+  var text = this.text;
+  var reactive = this.reactive;
+  var model = reactive.model;
+
+  // TODO: delegate most of this to `Reactive`
+  debug('render "%s"', text);
+  node.data = utils.interpolate(text, function(prop, fn){
+    if (fn) {
+      return fn(reactive);
+    } else {
+      return reactive.get(prop);
+    }
+  });
+};
+
+},{"./utils":17,"debug":25}],17:[function(require,module,exports){
+
+/**
+ * Module dependencies.
+ */
+
+var debug = require('debug')('reactive:utils');
+//var props = require('props');
+
+/**
+ * Function cache.
+ */
+
+var cache = {};
+
+/**
+ * Return possible properties of a string
+ * @param {String} str
+ * @return {Array} of properties found in the string
+ * @api private
+ */
+var props = function(str) {
+  return str
+    .replace(/\w+ *\(|"[^"]*"|'[^']*'|\/([^/]+)\//g, '')
+    .match(/[a-zA-Z_]\w*([.][a-zA-Z_]\w*)*/g)
+    || [];
+};
+/**
+ * Return interpolation property names in `str`,
+ * for example "{foo} and {bar}" would return
+ * ['foo', 'bar'].
+ *
+ * @param {String} str
+ * @return {Array}
+ * @api private
+ */
+
+exports.interpolationProps = function(str) {
+  var m;
+  var arr = [];
+  var re = /\{([^}]+)\}/g;
+
+  while (m = re.exec(str)) {
+    var expr = m[1];
+    arr = arr.concat(props(expr));
+  }
+
+  return unique(arr);
+};
+
+/**
+ * Interpolate `str` with the given `fn`.
+ *
+ * @param {String} str
+ * @param {Function} fn
+ * @return {String}
+ * @api private
+ */
+
+exports.interpolate = function(str, fn){
+  return str.replace(/\{([^}]+)\}/g, function(_, expr){
+    var cb = cache[expr];
+    if (!cb) cb = cache[expr] = compile(expr);
+    var val = fn(expr.trim(), cb);
+    return val == null ? '' : val;
+  });
+};
+
+/**
+ * Check if `str` has interpolation.
+ *
+ * @param {String} str
+ * @return {Boolean}
+ * @api private
+ */
+
+exports.hasInterpolation = function(str) {
+  return ~str.indexOf('{');
+};
+
+/**
+ * Compile `expr` to a `Function`.
+ *
+ * @param {String} expr
+ * @return {Function}
+ * @api private
+ */
+
+function compile(expr) {
+  var re = /\.\w+|\w+ *\(|"[^"]*"|'[^']*'|\/([^/]+)\/|[a-zA-Z_]\w*(\.[a-zA-Z_]\w*)*/g;
+  var p = props(expr);
+
+  // replace function calls with [ ] syntax to avoid capture as property
+  var funCallRe = /.\w+ *\(/g;
+  var body = expr.replace(funCallRe, function(_) {
+    return '[\'' + _.slice(1, -1) + '\'](';
+  });
+
+  var body = body.replace(re, function(_) {
+    if (p.indexOf(_) >= 0) {
+      return access(_);
+    };
+
+    return _;
+  });
+
+  debug('compile `%s`', body);
+  return new Function('reactive', 'return ' + body);
+}
+
+/**
+ * Access a method `prop` with dot notation.
+ *
+ * @param {String} prop
+ * @return {String}
+ * @api private
+ */
+
+function access(prop) {
+  return 'reactive.get(\'' + prop + '\')';
+}
+
+/**
+ * Return unique array.
+ *
+ * @param {Array} arr
+ * @return {Array}
+ * @api private
+ */
+
+function unique(arr) {
+  var ret = [];
+
+  for (var i = 0; i < arr.length; i++) {
+    if (~ret.indexOf(arr[i])) continue;
+    ret.push(arr[i]);
+  }
+
+  return ret;
+}
+
+},{"debug":25}],18:[function(require,module,exports){
+/**
+ * @api private
+ */
+module.exports = function walk(el, process, done) {
+  var end = done || function(){};
+  var nodes = [].slice.call(el.childNodes);
+
+  function next(stop){
+    if (stop || nodes.length === 0) {
+      return end();
+    }
+    walk(nodes.shift(), process, next);
+  }
+
+  process(el, next);
+}
+
+},{}],19:[function(require,module,exports){
+
+/**
+ * dependencies
+ */
+
+var merge = require('./lib/merge-attrs')
+  , classes = require('classes')
+  , uniq = require('uniq');
+
+/**
+ * Export `carry`
+ */
+
+module.exports = carry;
+
+/**
+ * Carry over attrs and classes
+ * from `b` to `a`.
+ *
+ * @param {Element} a
+ * @param {Element} b
+ * @return {Element}
+ * @api public
+ */
+
+function carry(a, b){
+  if (!a) return b.cloneNode();
+  carry.attrs(a, b);
+  carry.classes(a, b);
+  return a;
+}
+
+/**
+ * Carry attributes.
+ *
+ * @param {Element} a
+ * @param {Element} b
+ * @return {Element} a
+ * @api public
+ */
+
+carry.attrs = function(a, b){
+  merge(a, b);
+  return a;
+};
+
+/**
+ * Carry over classes.
+ *
+ * @param {Element} a
+ * @param {Element} b
+ * @return {Element} a
+ * @api public
+ */
+
+carry.classes = function(a, b){
+  if (a.className == b.className) return a;
+  var blist = classes(b).array();
+  var alist = classes(a).array();
+  var list = alist.concat(blist);
+  a.className = uniq(list).join(' ');
+  return a;
+};
+
+},{"./lib/merge-attrs":20,"classes":23,"uniq":21}],20:[function(require,module,exports){
+
+/**
+ * Export `merge`
+ */
+
+module.exports = merge;
+
+/**
+ * Merge `b`'s attrs into `a`.
+ *
+ * @param {Element} a
+ * @param {Element} b
+ * @api public
+ */
+
+function merge(a, b){
+  for (var i = 0; i < b.attributes.length; ++i) {
+    var attr = b.attributes[i];
+    if (ignore(a, attr)) continue;
+    a.setAttribute(attr.name, attr.value);
+  }
+}
+
+/**
+ * Check if `attr` should be ignored.
+ *
+ * @param {Element} a
+ * @param {Attr} attr
+ * @return {Boolean}
+ * @api private
+ */
+
+function ignore(a, attr){
+  return !attr.specified
+    || 'class' == attr.name
+    || 'id' == attr.name
+    || a.hasAttribute(attr.name);
+}
+
+},{}],21:[function(require,module,exports){
+
+/**
+ * dependencies
+ */
+
+var indexOf = require('indexof');
+
+/**
+ * Create duplicate free array
+ * from the provided `arr`.
+ *
+ * @param {Array} arr
+ * @param {Array} select
+ * @return {Array}
+ */
+
+module.exports = function (arr, select) {
+  var len = arr.length, ret = [], v;
+  select = select ? (select instanceof Array ? select : [select]) : false;
+
+  for (var i = 0; i < len; i++) {
+    v = arr[i];
+    if (select && !~indexOf(select, v)) {
+      ret.push(v);
+    } else if (!~indexOf(ret, v)) {
+      ret.push(v);
+    }
+  }
+  return ret;
+};
+
+},{"indexof":22}],22:[function(require,module,exports){
+
+var indexOf = [].indexOf;
+
+module.exports = function(arr, obj){
+  if (indexOf) return arr.indexOf(obj);
+  for (var i = 0; i < arr.length; ++i) {
+    if (arr[i] === obj) return i;
+  }
+  return -1;
+};
+},{}],23:[function(require,module,exports){
+/**
+ * Module dependencies.
+ */
+
+var index = require('indexof');
+
+/**
+ * Whitespace regexp.
+ */
+
+var re = /\s+/;
+
+/**
+ * toString reference.
+ */
+
+var toString = Object.prototype.toString;
+
+/**
+ * Wrap `el` in a `ClassList`.
+ *
+ * @param {Element} el
+ * @return {ClassList}
+ * @api public
+ */
+
+module.exports = function(el){
+  return new ClassList(el);
+};
+
+/**
+ * Initialize a new ClassList for `el`.
+ *
+ * @param {Element} el
+ * @api private
+ */
+
+function ClassList(el) {
+  if (!el) throw new Error('A DOM element reference is required');
+  this.el = el;
+  this.list = el.classList;
+}
+
+/**
+ * Add class `name` if not already present.
+ *
+ * @param {String} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.add = function(name){
+  // classList
+  if (this.list) {
+    this.list.add(name);
+    return this;
+  }
+
+  // fallback
+  var arr = this.array();
+  var i = index(arr, name);
+  if (!~i) arr.push(name);
+  this.el.className = arr.join(' ');
+  return this;
+};
+
+/**
+ * Remove class `name` when present, or
+ * pass a regular expression to remove
+ * any which match.
+ *
+ * @param {String|RegExp} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.remove = function(name){
+  if ('[object RegExp]' == toString.call(name)) {
+    return this.removeMatching(name);
+  }
+
+  // classList
+  if (this.list) {
+    this.list.remove(name);
+    return this;
+  }
+
+  // fallback
+  var arr = this.array();
+  var i = index(arr, name);
+  if (~i) arr.splice(i, 1);
+  this.el.className = arr.join(' ');
+  return this;
+};
+
+/**
+ * Remove all classes matching `re`.
+ *
+ * @param {RegExp} re
+ * @return {ClassList}
+ * @api private
+ */
+
+ClassList.prototype.removeMatching = function(re){
+  var arr = this.array();
+  for (var i = 0; i < arr.length; i++) {
+    if (re.test(arr[i])) {
+      this.remove(arr[i]);
+    }
+  }
+  return this;
+};
+
+/**
+ * Toggle class `name`.
+ *
+ * @param {String} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.toggle = function(name){
+  // classList
+  if (this.list) {
+    this.list.toggle(name);
+    return this;
+  }
+
+  // fallback
+  if (this.has(name)) {
+    this.remove(name);
+  } else {
+    this.add(name);
+  }
+  return this;
+};
+
+/**
+ * Return an array of classes.
+ *
+ * @return {Array}
+ * @api public
+ */
+
+ClassList.prototype.array = function(){
+  var str = this.el.className.replace(/^\s+|\s+$/g, '');
+  var arr = str.split(re);
+  if ('' === arr[0]) arr.shift();
+  return arr;
+};
+
+/**
+ * Check if class `name` is present.
+ *
+ * @param {String} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.has =
+ClassList.prototype.contains = function(name){
+  return this.list
+    ? this.list.contains(name)
+    : !! ~index(this.array(), name);
+};
+
+},{"indexof":24}],24:[function(require,module,exports){
+module.exports=require(22)
+},{}],25:[function(require,module,exports){
+
+/**
+ * Expose `debug()` as the module.
+ */
+
+module.exports = debug;
+
+/**
+ * Create a debugger with the given `name`.
+ *
+ * @param {String} name
+ * @return {Type}
+ * @api public
+ */
+
+function debug(name) {
+  if (!debug.enabled(name)) return function(){};
+
+  return function(fmt){
+    fmt = coerce(fmt);
+
+    var curr = new Date;
+    var ms = curr - (debug[name] || curr);
+    debug[name] = curr;
+
+    fmt = name
+      + ' '
+      + fmt
+      + ' +' + debug.humanize(ms);
+
+    // This hackery is required for IE8
+    // where `console.log` doesn't have 'apply'
+    window.console
+      && console.log
+      && Function.prototype.apply.call(console.log, console, arguments);
+  }
+}
+
+/**
+ * The currently active debug mode names.
+ */
+
+debug.names = [];
+debug.skips = [];
+
+/**
+ * Enables a debug mode by name. This can include modes
+ * separated by a colon and wildcards.
+ *
+ * @param {String} name
+ * @api public
+ */
+
+debug.enable = function(name) {
+  try {
+    localStorage.debug = name;
+  } catch(e){}
+
+  var split = (name || '').split(/[\s,]+/)
+    , len = split.length;
+
+  for (var i = 0; i < len; i++) {
+    name = split[i].replace('*', '.*?');
+    if (name[0] === '-') {
+      debug.skips.push(new RegExp('^' + name.substr(1) + '$'));
+    }
+    else {
+      debug.names.push(new RegExp('^' + name + '$'));
+    }
+  }
+};
+
+/**
+ * Disable debug output.
+ *
+ * @api public
+ */
+
+debug.disable = function(){
+  debug.enable('');
+};
+
+/**
+ * Humanize the given `ms`.
+ *
+ * @param {Number} m
+ * @return {String}
+ * @api private
+ */
+
+debug.humanize = function(ms) {
+  var sec = 1000
+    , min = 60 * 1000
+    , hour = 60 * min;
+
+  if (ms >= hour) return (ms / hour).toFixed(1) + 'h';
+  if (ms >= min) return (ms / min).toFixed(1) + 'm';
+  if (ms >= sec) return (ms / sec | 0) + 's';
+  return ms + 'ms';
+};
+
+/**
+ * Returns true if the given mode name is enabled, false otherwise.
+ *
+ * @param {String} name
+ * @return {Boolean}
+ * @api public
+ */
+
+debug.enabled = function(name) {
+  for (var i = 0, len = debug.skips.length; i < len; i++) {
+    if (debug.skips[i].test(name)) {
+      return false;
+    }
+  }
+  for (var i = 0, len = debug.names.length; i < len; i++) {
+    if (debug.names[i].test(name)) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
+ * Coerce `val`.
+ */
+
+function coerce(val) {
+  if (val instanceof Error) return val.stack || val.message;
+  return val;
+}
+
+// persist
+
+try {
+  if (window.localStorage) debug.enable(localStorage.debug);
+} catch(e){}
+
+},{}],26:[function(require,module,exports){
+
+/**
+ * Expose `parse`.
+ */
+
+module.exports = parse;
+
+/**
+ * Wrap map from jquery.
+ */
+
+var map = {
+  legend: [1, '<fieldset>', '</fieldset>'],
+  tr: [2, '<table><tbody>', '</tbody></table>'],
+  col: [2, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
+  _default: [0, '', '']
+};
+
+map.td =
+map.th = [3, '<table><tbody><tr>', '</tr></tbody></table>'];
+
+map.option =
+map.optgroup = [1, '<select multiple="multiple">', '</select>'];
+
+map.thead =
+map.tbody =
+map.colgroup =
+map.caption =
+map.tfoot = [1, '<table>', '</table>'];
+
+map.text =
+map.circle =
+map.ellipse =
+map.line =
+map.path =
+map.polygon =
+map.polyline =
+map.rect = [1, '<svg xmlns="http://www.w3.org/2000/svg" version="1.1">','</svg>'];
+
+/**
+ * Parse `html` and return the children.
+ *
+ * @param {String} html
+ * @return {Array}
+ * @api private
+ */
+
+function parse(html) {
+  if ('string' != typeof html) throw new TypeError('String expected');
+  
+  // tag name
+  var m = /<([\w:]+)/.exec(html);
+  if (!m) return document.createTextNode(html);
+
+  html = html.replace(/^\s+|\s+$/g, ''); // Remove leading/trailing whitespace
+
+  var tag = m[1];
+
+  // body support
+  if (tag == 'body') {
+    var el = document.createElement('html');
+    el.innerHTML = html;
+    return el.removeChild(el.lastChild);
+  }
+
+  // wrap map
+  var wrap = map[tag] || map._default;
+  var depth = wrap[0];
+  var prefix = wrap[1];
+  var suffix = wrap[2];
+  var el = document.createElement('div');
+  el.innerHTML = prefix + html + suffix;
+  while (depth--) el = el.lastChild;
+
+  // one element
+  if (el.firstChild == el.lastChild) {
+    return el.removeChild(el.firstChild);
+  }
+
+  // several elements
+  var fragment = document.createDocumentFragment();
+  while (el.firstChild) {
+    fragment.appendChild(el.removeChild(el.firstChild));
+  }
+
+  return fragment;
+}
+
+},{}],27:[function(require,module,exports){
+
+/**
+ * Expose `Emitter`.
+ */
+
+module.exports = Emitter;
+
+/**
+ * Initialize a new `Emitter`.
+ *
+ * @api public
+ */
+
+function Emitter(obj) {
+  if (obj) return mixin(obj);
+};
+
+/**
+ * Mixin the emitter properties.
+ *
+ * @param {Object} obj
+ * @return {Object}
+ * @api private
+ */
+
+function mixin(obj) {
+  for (var key in Emitter.prototype) {
+    obj[key] = Emitter.prototype[key];
+  }
+  return obj;
+}
+
+/**
+ * Listen on the given `event` with `fn`.
+ *
+ * @param {String} event
+ * @param {Function} fn
+ * @return {Emitter}
+ * @api public
+ */
+
+Emitter.prototype.on =
+Emitter.prototype.addEventListener = function(event, fn){
+  this._callbacks = this._callbacks || {};
+  (this._callbacks[event] = this._callbacks[event] || [])
+    .push(fn);
+  return this;
+};
+
+/**
+ * Adds an `event` listener that will be invoked a single
+ * time then automatically removed.
+ *
+ * @param {String} event
+ * @param {Function} fn
+ * @return {Emitter}
+ * @api public
+ */
+
+Emitter.prototype.once = function(event, fn){
+  var self = this;
+  this._callbacks = this._callbacks || {};
+
+  function on() {
+    self.off(event, on);
+    fn.apply(this, arguments);
+  }
+
+  on.fn = fn;
+  this.on(event, on);
+  return this;
+};
+
+/**
+ * Remove the given callback for `event` or all
+ * registered callbacks.
+ *
+ * @param {String} event
+ * @param {Function} fn
+ * @return {Emitter}
+ * @api public
+ */
+
+Emitter.prototype.off =
+Emitter.prototype.removeListener =
+Emitter.prototype.removeAllListeners =
+Emitter.prototype.removeEventListener = function(event, fn){
+  this._callbacks = this._callbacks || {};
+
+  // all
+  if (0 == arguments.length) {
+    this._callbacks = {};
+    return this;
+  }
+
+  // specific event
+  var callbacks = this._callbacks[event];
+  if (!callbacks) return this;
+
+  // remove all handlers
+  if (1 == arguments.length) {
+    delete this._callbacks[event];
+    return this;
+  }
+
+  // remove specific handler
+  var cb;
+  for (var i = 0; i < callbacks.length; i++) {
+    cb = callbacks[i];
+    if (cb === fn || cb.fn === fn) {
+      callbacks.splice(i, 1);
+      break;
+    }
+  }
+  return this;
+};
+
+/**
+ * Emit `event` with the given args.
+ *
+ * @param {String} event
+ * @param {Mixed} ...
+ * @return {Emitter}
+ */
+
+Emitter.prototype.emit = function(event){
+  this._callbacks = this._callbacks || {};
+  var args = [].slice.call(arguments, 1)
+    , callbacks = this._callbacks[event];
+
+  if (callbacks) {
+    callbacks = callbacks.slice(0);
+    for (var i = 0, len = callbacks.length; i < len; ++i) {
+      callbacks[i].apply(this, args);
+    }
+  }
+
+  return this;
+};
+
+/**
+ * Return array of callbacks for `event`.
+ *
+ * @param {String} event
+ * @return {Array}
+ * @api public
+ */
+
+Emitter.prototype.listeners = function(event){
+  this._callbacks = this._callbacks || {};
+  return this._callbacks[event] || [];
+};
+
+/**
+ * Check if this emitter has `event` handlers.
+ *
+ * @param {String} event
+ * @return {Boolean}
+ * @api public
+ */
+
+Emitter.prototype.hasListeners = function(event){
+  return !! this.listeners(event).length;
+};
+
+},{}],28:[function(require,module,exports){
+
+/**
+ * Bind `el` event `type` to `fn`.
+ *
+ * @param {Element} el
+ * @param {String} type
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @return {Function}
+ * @api public
+ */
+
+exports.bind = function(el, type, fn, capture){
+  if (el.addEventListener) {
+    el.addEventListener(type, fn, capture);
+  } else {
+    el.attachEvent('on' + type, fn);
+  }
+  return fn;
+};
+
+/**
+ * Unbind `el` event `type`'s callback `fn`.
+ *
+ * @param {Element} el
+ * @param {String} type
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @return {Function}
+ * @api public
+ */
+
+exports.unbind = function(el, type, fn, capture){
+  if (el.removeEventListener) {
+    el.removeEventListener(type, fn, capture);
+  } else {
+    el.detachEvent('on' + type, fn);
+  }
+  return fn;
+};
+
+},{}],29:[function(require,module,exports){
+
+function one(selector, el) {
+  return el.querySelector(selector);
+}
+
+exports = module.exports = function(selector, el){
+  el = el || document;
+  return one(selector, el);
+};
+
+exports.all = function(selector, el){
+  el = el || document;
+  return el.querySelectorAll(selector);
+};
+
+exports.engine = function(obj){
+  if (!obj.one) throw new Error('.one callback required');
+  if (!obj.all) throw new Error('.all callback required');
+  one = obj.one;
+  exports.all = obj.all;
+};
+
+},{}],30:[function(require,module,exports){
 var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
@@ -8092,74 +10087,231 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
         html.options = __vopts;
         model = model || {};
         html.vl = 1, html.vc = 0;
-        __vbuffer.push('<div class="pane">');
-        html.vl = 1, html.vc = 18;
+        __vbuffer.push('<div class="container container-fluid">');
+        html.vl = 1, html.vc = 39;
         __vbuffer.push('\n');
         html.vl = 2, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 2, html.vc = 1;
-        __vbuffer.push('<div class="bar bar-header bar-dark">');
-        html.vl = 2, html.vc = 38;
+        __vbuffer.push('<div id="select-container" class="row">');
+        html.vl = 2, html.vc = 40;
         __vbuffer.push('\n');
         html.vl = 3, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 3, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 3, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 3, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 3, html.vc = 4;
-        __vbuffer.push('<h1 class="title">');
-        html.vl = 3, html.vc = 22;
-        __vbuffer.push('Record');
-        html.vl = 3, html.vc = 28;
-        __vbuffer.push(' ');
-        html.vl = 3, html.vc = 29;
-        __vbuffer.push('Manager');
-        html.vl = 3, html.vc = 36;
-        __vbuffer.push('</h1>');
-        html.vl = 3, html.vc = 41;
+        __vbuffer.push('</div>');
+        html.vl = 3, html.vc = 7;
         __vbuffer.push('\n');
         html.vl = 4, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 4, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 4, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 4, html.vc = 3;
-        __vbuffer.push(' ');
-        html.vl = 4, html.vc = 4;
-        __vbuffer.push('<button class="js-btn-save button button-balanced">');
-        html.vl = 4, html.vc = 55;
-        __vbuffer.push('Save');
-        html.vl = 4, html.vc = 59;
-        __vbuffer.push('</button>');
-        html.vl = 4, html.vc = 68;
+        __vbuffer.push('<div id="list-container" class="row">');
+        html.vl = 4, html.vc = 38;
         __vbuffer.push('\n');
         html.vl = 5, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 5, html.vc = 1;
-        __vbuffer.push(' ');
-        html.vl = 5, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 5, html.vc = 3;
         __vbuffer.push('</div>');
-        html.vl = 5, html.vc = 9;
+        html.vl = 5, html.vc = 7;
         __vbuffer.push('\n');
         html.vl = 6, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 6, html.vc = 1;
-        __vbuffer.push('<div class="content has-header">');
-        html.vl = 6, html.vc = 33;
+        __vbuffer.push('<div class="row">');
+        html.vl = 6, html.vc = 18;
         __vbuffer.push('\n');
         html.vl = 7, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 7, html.vc = 1;
         __vbuffer.push('\t');
         html.vl = 7, html.vc = 2;
-        __vbuffer.push('<ul class="list">');
-        html.vl = 7, html.vc = 19;
+        __vbuffer.push('<p class="text-right">');
+        html.vl = 7, html.vc = 24;
+        __vbuffer.push('<a class="js-btn-save btn btn-success btn-lg" role="button">');
+        html.vl = 7, html.vc = 84;
+        __vbuffer.push('Save');
+        html.vl = 7, html.vc = 88;
+        __vbuffer.push('</a>');
+        html.vl = 7, html.vc = 92;
+        __vbuffer.push('</p>');
+        html.vl = 7, html.vc = 96;
+        __vbuffer.push('\n');
+        html.vl = 8, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 8, html.vc = 1;
+        __vbuffer.push('</div>');
+        html.vl = 8, html.vc = 7;
+        __vbuffer.push('\n');
+        html.vl = 9, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 9, html.vc = 1;
+        __vbuffer.push('<div class="row">');
+        html.vl = 9, html.vc = 18;
+        __vbuffer.push('\n');
+        html.vl = 10, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 10, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 10, html.vc = 2;
+        __vbuffer.push('<pre id="results" style="display:none;">');
+        html.vl = 10, html.vc = 42;
+        __vbuffer.push('\n');
+        html.vl = 11, html.vc = 0;
+        __vbuffer.push('\n');
+        html.vl = 12, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 12, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 12, html.vc = 2;
+        __vbuffer.push('</pre>');
+        html.vl = 12, html.vc = 8;
+        __vbuffer.push('\n');
+        html.vl = 13, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 13, html.vc = 1;
+        __vbuffer.push('</div>');
+        html.vl = 13, html.vc = 7;
+        __vbuffer.push('\n');
+        html.vl = 14, html.vc = 0;
+        __vbuffer.push('</div>');
+        html.vl = 14, html.vc = 6;
+        __vbuffer.push('\n');
+        html.vl = 15, html.vc = 0;
+        __vbuffer.push('\n');
+        __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
+        return __vopts && __vopts.asContext ? html : html.toString();
+    } catch (e) {
+        html.reportError(e, html.vl, html.vc, '<div class="container container-fluid">!LB!\t<div id="select-container" class="row">!LB!\t</div>!LB!\t<div id="list-container" class="row">!LB!\t</div>!LB!\t<div class="row">!LB!\t\t<p class="text-right"><a class="js-btn-save btn btn-success btn-lg" role="button">Save</a></p>!LB!\t</div>!LB!\t<div class="row">!LB!\t\t<pre id="results" style="display:none;">!LB!!LB!\t\t</pre>!LB!\t</div>!LB!</div>!LB!!LB!');
+    }
+}, {
+    'simple': false,
+    'modelName': 'model',
+    'helpersName': 'html'
+});
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":37}],31:[function(require,module,exports){
+var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
+module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
+    try {
+        var __vbuffer = html.buffer;
+        html.options = __vopts;
+        model = model || {};
+        html.vl = 1, html.vc = 0;
+        __vbuffer.push('\n');
+        html.vl = 2, html.vc = 0;
+        __vbuffer.push('<nav class="navbar navbar-default" role="navigation">');
+        html.vl = 2, html.vc = 53;
+        __vbuffer.push('\n');
+        html.vl = 3, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 3, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 3, html.vc = 2;
+        __vbuffer.push('<div class="container-fluid">');
+        html.vl = 3, html.vc = 31;
+        __vbuffer.push('\n');
+        html.vl = 4, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 4, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 4, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 4, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 4, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 4, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 4, html.vc = 6;
+        __vbuffer.push('<ul class="nav navbar-nav navbar-right">');
+        html.vl = 4, html.vc = 46;
+        __vbuffer.push('\n');
+        html.vl = 5, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 5, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 5, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 5, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 5, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 5, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 5, html.vc = 6;
+        __vbuffer.push(' ');
+        html.vl = 5, html.vc = 7;
+        __vbuffer.push(' ');
+        html.vl = 5, html.vc = 8;
+        __vbuffer.push('<li class="dropdown">');
+        html.vl = 5, html.vc = 29;
+        __vbuffer.push('\n');
+        html.vl = 6, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 6, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 6, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 6, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 6, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 6, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 6, html.vc = 6;
+        __vbuffer.push(' ');
+        html.vl = 6, html.vc = 7;
+        __vbuffer.push(' ');
+        html.vl = 6, html.vc = 8;
+        __vbuffer.push(' ');
+        html.vl = 6, html.vc = 9;
+        __vbuffer.push(' ');
+        html.vl = 6, html.vc = 10;
+        __vbuffer.push('<a href="#" class="dropdown-toggle" data-toggle="dropdown">');
+        html.vl = 6, html.vc = 69;
+        __vbuffer.push('Add');
+        html.vl = 6, html.vc = 72;
+        __vbuffer.push(' ');
+        html.vl = 6, html.vc = 73;
+        __vbuffer.push('a');
+        html.vl = 6, html.vc = 74;
+        __vbuffer.push(' ');
+        html.vl = 6, html.vc = 75;
+        __vbuffer.push('new');
+        html.vl = 6, html.vc = 78;
+        __vbuffer.push(' ');
+        html.vl = 6, html.vc = 79;
+        __vbuffer.push('record');
+        html.vl = 6, html.vc = 85;
+        __vbuffer.push('<span class="caret">');
+        html.vl = 6, html.vc = 105;
+        __vbuffer.push('</span>');
+        html.vl = 6, html.vc = 112;
+        __vbuffer.push('</a>');
+        html.vl = 6, html.vc = 116;
+        __vbuffer.push('\n');
+        html.vl = 7, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 7, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 7, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 7, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 7, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 7, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 7, html.vc = 6;
+        __vbuffer.push(' ');
+        html.vl = 7, html.vc = 7;
+        __vbuffer.push(' ');
+        html.vl = 7, html.vc = 8;
+        __vbuffer.push(' ');
+        html.vl = 7, html.vc = 9;
+        __vbuffer.push(' ');
+        html.vl = 7, html.vc = 10;
+        __vbuffer.push('<ul class="dropdown-menu" role="menu">');
+        html.vl = 7, html.vc = 48;
         __vbuffer.push('\n');
         html.vl = 8, html.vc = 0;
         __vbuffer.push('\t');
@@ -8167,229 +10319,109 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
         __vbuffer.push('\t');
         html.vl = 8, html.vc = 2;
         __vbuffer.push('\t');
-        html.vl = 8, html.vc = 3;
-        __vbuffer.push('<li id="select-container" class="item item-input item-select">');
-        html.vl = 8, html.vc = 65;
-        __vbuffer.push('\n');
-        html.vl = 9, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 9, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 9, html.vc = 2;
-        __vbuffer.push('\t');
-        html.vl = 9, html.vc = 3;
-        __vbuffer.push('</li>');
-        html.vl = 9, html.vc = 8;
-        __vbuffer.push('\n');
-        html.vl = 10, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 10, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 10, html.vc = 2;
-        __vbuffer.push('</ul>');
-        html.vl = 10, html.vc = 7;
-        __vbuffer.push('\n');
-        html.vl = 11, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 11, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 11, html.vc = 2;
-        __vbuffer.push('<ul id="list-container" class="list">');
-        html.vl = 11, html.vc = 39;
-        __vbuffer.push('\n');
-        html.vl = 12, html.vc = 0;
-        __vbuffer.push('\n');
-        html.vl = 13, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 13, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 13, html.vc = 2;
-        __vbuffer.push('</ul>');
-        html.vl = 13, html.vc = 7;
-        __vbuffer.push('\n');
-        html.vl = 14, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 14, html.vc = 1;
-        __vbuffer.push('</div>');
-        html.vl = 14, html.vc = 7;
-        __vbuffer.push('\n');
-        html.vl = 15, html.vc = 0;
-        __vbuffer.push('\n');
-        html.vl = 16, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 16, html.vc = 1;
-        __vbuffer.push('<div class="bar bar-footer bar-dark">');
-        html.vl = 16, html.vc = 38;
-        __vbuffer.push('\n');
-        html.vl = 17, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 17, html.vc = 1;
-        __vbuffer.push('</div>');
-        html.vl = 17, html.vc = 7;
-        __vbuffer.push('\n');
-        html.vl = 18, html.vc = 0;
-        __vbuffer.push('</div>');
-        html.vl = 18, html.vc = 6;
-        __vbuffer.push('\n');
-        __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
-        return __vopts && __vopts.asContext ? html : html.toString();
-    } catch (e) {
-        html.reportError(e, html.vl, html.vc, '<div class="pane">!LB!\t<div class="bar bar-header bar-dark">!LB!\t\t  <h1 class="title">Record Manager</h1>!LB!\t\t  <button class="js-btn-save button button-balanced">Save</button>!LB!\t  </div>!LB!\t<div class="content has-header">!LB!\t\t<ul class="list">!LB!\t\t\t<li id="select-container" class="item item-input item-select">!LB!\t\t\t</li>!LB!\t\t</ul>!LB!\t\t<ul id="list-container" class="list">!LB!!LB!\t\t</ul>!LB!\t</div>!LB!!LB!\t<div class="bar bar-footer bar-dark">!LB!\t</div>!LB!</div>!LB!');
-    }
-}, {
-    'simple': false,
-    'modelName': 'model',
-    'helpersName': 'html'
-});
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],12:[function(require,module,exports){
-var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
-module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
-    try {
-        var __vbuffer = html.buffer;
-        html.options = __vopts;
-        model = model || {};
-        html.vl = 1, html.vc = 0;
-        __vbuffer.push('\n');
-        html.vl = 2, html.vc = 0;
-        __vbuffer.push('<div style="display:none" class="modal">');
-        html.vl = 2, html.vc = 40;
-        __vbuffer.push('\n');
-        html.vl = 3, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 3, html.vc = 1;
-        __vbuffer.push('<ion-header-bar>');
-        html.vl = 3, html.vc = 17;
-        __vbuffer.push('\n');
-        html.vl = 4, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 4, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 4, html.vc = 2;
-        __vbuffer.push('<h1 class="title">');
-        html.vl = 4, html.vc = 20;
-        __vbuffer.push('Labeled');
-        html.vl = 4, html.vc = 27;
-        __vbuffer.push(' ');
-        html.vl = 4, html.vc = 28;
-        __vbuffer.push('Flags');
-        html.vl = 4, html.vc = 33;
-        __vbuffer.push('</h1>');
-        html.vl = 4, html.vc = 38;
-        __vbuffer.push('\n');
-        html.vl = 5, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 5, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 5, html.vc = 2;
-        __vbuffer.push('<div class="buttons">');
-        html.vl = 5, html.vc = 23;
-        __vbuffer.push('\n');
-        html.vl = 6, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 6, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 6, html.vc = 2;
-        __vbuffer.push('<button class="button button-clear js-close">');
-        html.vl = 6, html.vc = 47;
-        __vbuffer.push('Close');
-        html.vl = 6, html.vc = 52;
-        __vbuffer.push('</button>');
-        html.vl = 6, html.vc = 61;
-        __vbuffer.push('\n');
-        html.vl = 7, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 7, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 7, html.vc = 2;
-        __vbuffer.push('</div>');
-        html.vl = 7, html.vc = 8;
-        __vbuffer.push('\n');
-        html.vl = 8, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 8, html.vc = 1;
-        __vbuffer.push('</ion-header-bar>');
-        html.vl = 8, html.vc = 18;
-        __vbuffer.push('\n');
-        html.vl = 9, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 9, html.vc = 1;
-        __vbuffer.push('<ion-content>');
-        html.vl = 9, html.vc = 14;
-        __vbuffer.push('\n');
-        html.vl = 10, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 10, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 10, html.vc = 2;
-        __vbuffer.push(' ');
-        html.vl = 10, html.vc = 3;
-        __vbuffer.push('\t');
-        html.vl = 10, html.vc = 4;
-        __vbuffer.push('<div class="modal-body">');
-        html.vl = 10, html.vc = 28;
-        __vbuffer.push('\n');
-        html.vl = 11, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 11, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 11, html.vc = 2;
-        __vbuffer.push('\t');
-        html.vl = 11, html.vc = 3;
-        __vbuffer.push('</div>');
-        html.vl = 11, html.vc = 9;
-        __vbuffer.push('\n');
-        html.vl = 12, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 12, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 12, html.vc = 2;
-        __vbuffer.push('\t');
-        html.vl = 12, html.vc = 3;
-        __vbuffer.push('<div class="list">');
-        html.vl = 12, html.vc = 21;
+        html.vl = 8, html.vc = 4;
+        __vbuffer.push(model.recordTypes.forEach(function (recordType) {
+            html.vl = 9, html.vc = 4;
+            __vbuffer.push('<li>');
+            html.vl = 9, html.vc = 8;
+            __vbuffer.push('\n');
+            html.vl = 10, html.vc = 0;
+            __vbuffer.push('\t');
+            html.vl = 10, html.vc = 1;
+            __vbuffer.push('\t');
+            html.vl = 10, html.vc = 2;
+            __vbuffer.push('\t');
+            html.vl = 10, html.vc = 3;
+            __vbuffer.push('\t');
+            html.vl = 10, html.vc = 4;
+            __vbuffer.push('\t');
+            html.vl = 10, html.vc = 5;
+            __vbuffer.push('<button class="js-new-record btn btn-block btn-default btn-lg">');
+            html.vl = 10, html.vc = 69;
+            __vbuffer.push(html.escape(recordType).toHtmlString());
+            html.vl = 10, html.vc = 69;
+            html.vl = 10, html.vc = 79;
+            __vbuffer.push('</button>');
+            html.vl = 10, html.vc = 88;
+            __vbuffer.push('\n');
+            html.vl = 11, html.vc = 0;
+            __vbuffer.push('\t');
+            html.vl = 11, html.vc = 1;
+            __vbuffer.push('\t');
+            html.vl = 11, html.vc = 2;
+            __vbuffer.push('\t');
+            html.vl = 11, html.vc = 3;
+            __vbuffer.push('\t');
+            html.vl = 11, html.vc = 4;
+            __vbuffer.push('</li>');
+        }));
+        html.vl = 12, html.vc = 4;
+        html.vl = 12, html.vc = 5;
         __vbuffer.push('\n');
         html.vl = 13, html.vc = 0;
-        __vbuffer.push('\t');
+        __vbuffer.push(' ');
         html.vl = 13, html.vc = 1;
-        __vbuffer.push('\t');
+        __vbuffer.push(' ');
         html.vl = 13, html.vc = 2;
-        __vbuffer.push('\t');
+        __vbuffer.push(' ');
         html.vl = 13, html.vc = 3;
-        __vbuffer.push('<label class="item">');
-        html.vl = 13, html.vc = 23;
+        __vbuffer.push(' ');
+        html.vl = 13, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 13, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 13, html.vc = 6;
+        __vbuffer.push(' ');
+        html.vl = 13, html.vc = 7;
+        __vbuffer.push(' ');
+        html.vl = 13, html.vc = 8;
+        __vbuffer.push(' ');
+        html.vl = 13, html.vc = 9;
+        __vbuffer.push(' ');
+        html.vl = 13, html.vc = 10;
+        __vbuffer.push('</ul>');
+        html.vl = 13, html.vc = 15;
         __vbuffer.push('\n');
         html.vl = 14, html.vc = 0;
-        __vbuffer.push('\t');
+        __vbuffer.push(' ');
         html.vl = 14, html.vc = 1;
-        __vbuffer.push('\t');
+        __vbuffer.push(' ');
         html.vl = 14, html.vc = 2;
-        __vbuffer.push('\t');
+        __vbuffer.push(' ');
         html.vl = 14, html.vc = 3;
         __vbuffer.push(' ');
         html.vl = 14, html.vc = 4;
         __vbuffer.push(' ');
         html.vl = 14, html.vc = 5;
-        __vbuffer.push('<button class="js-close button button-block button-positive" type="button">');
-        html.vl = 14, html.vc = 80;
-        __vbuffer.push('Ok');
-        html.vl = 14, html.vc = 82;
-        __vbuffer.push('</button>');
-        html.vl = 14, html.vc = 91;
+        __vbuffer.push(' ');
+        html.vl = 14, html.vc = 6;
+        __vbuffer.push(' ');
+        html.vl = 14, html.vc = 7;
+        __vbuffer.push(' ');
+        html.vl = 14, html.vc = 8;
+        __vbuffer.push('</li>');
+        html.vl = 14, html.vc = 13;
         __vbuffer.push('\n');
         html.vl = 15, html.vc = 0;
-        __vbuffer.push('\t');
+        __vbuffer.push(' ');
         html.vl = 15, html.vc = 1;
-        __vbuffer.push('\t');
+        __vbuffer.push(' ');
         html.vl = 15, html.vc = 2;
-        __vbuffer.push('\t');
+        __vbuffer.push(' ');
         html.vl = 15, html.vc = 3;
-        __vbuffer.push('</label>');
+        __vbuffer.push(' ');
+        html.vl = 15, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 15, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 15, html.vc = 6;
+        __vbuffer.push('</ul>');
         html.vl = 15, html.vc = 11;
         __vbuffer.push('\n');
         html.vl = 16, html.vc = 0;
-        __vbuffer.push('\t');
+        __vbuffer.push(' ');
         html.vl = 16, html.vc = 1;
-        __vbuffer.push('\t');
+        __vbuffer.push(' ');
         html.vl = 16, html.vc = 2;
         __vbuffer.push(' ');
         html.vl = 16, html.vc = 3;
@@ -8397,28 +10429,86 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
         html.vl = 16, html.vc = 4;
         __vbuffer.push('</div>');
         html.vl = 16, html.vc = 10;
+        __vbuffer.push('<');
+        html.vl = 16, html.vc = 11;
+        __vbuffer.push('!');
+        html.vl = 16, html.vc = 12;
+        __vbuffer.push('-');
+        html.vl = 16, html.vc = 13;
+        __vbuffer.push('-');
+        html.vl = 16, html.vc = 14;
+        __vbuffer.push(' ');
+        html.vl = 16, html.vc = 15;
+        __vbuffer.push('/');
+        html.vl = 16, html.vc = 16;
+        __vbuffer.push('.');
+        html.vl = 16, html.vc = 17;
+        __vbuffer.push('navbar');
+        html.vl = 16, html.vc = 23;
+        __vbuffer.push('-');
+        html.vl = 16, html.vc = 24;
+        __vbuffer.push('collapse');
+        html.vl = 16, html.vc = 32;
+        __vbuffer.push(' ');
+        html.vl = 16, html.vc = 33;
+        __vbuffer.push('-');
+        html.vl = 16, html.vc = 34;
+        __vbuffer.push('-');
+        html.vl = 16, html.vc = 35;
+        __vbuffer.push('>');
+        html.vl = 16, html.vc = 36;
         __vbuffer.push('\n');
         html.vl = 17, html.vc = 0;
-        __vbuffer.push('\t');
+        __vbuffer.push(' ');
         html.vl = 17, html.vc = 1;
-        __vbuffer.push('</ion-content>');
+        __vbuffer.push(' ');
+        html.vl = 17, html.vc = 2;
+        __vbuffer.push('</div>');
+        html.vl = 17, html.vc = 8;
+        __vbuffer.push('<');
+        html.vl = 17, html.vc = 9;
+        __vbuffer.push('!');
+        html.vl = 17, html.vc = 10;
+        __vbuffer.push('-');
+        html.vl = 17, html.vc = 11;
+        __vbuffer.push('-');
+        html.vl = 17, html.vc = 12;
+        __vbuffer.push(' ');
+        html.vl = 17, html.vc = 13;
+        __vbuffer.push('/');
+        html.vl = 17, html.vc = 14;
+        __vbuffer.push('.');
         html.vl = 17, html.vc = 15;
+        __vbuffer.push('container');
+        html.vl = 17, html.vc = 24;
+        __vbuffer.push('-');
+        html.vl = 17, html.vc = 25;
+        __vbuffer.push('fluid');
+        html.vl = 17, html.vc = 30;
+        __vbuffer.push(' ');
+        html.vl = 17, html.vc = 31;
+        __vbuffer.push('-');
+        html.vl = 17, html.vc = 32;
+        __vbuffer.push('-');
+        html.vl = 17, html.vc = 33;
+        __vbuffer.push('>');
+        html.vl = 17, html.vc = 34;
         __vbuffer.push('\n');
         html.vl = 18, html.vc = 0;
-        __vbuffer.push('</div>');
+        __vbuffer.push('</nav>');
         html.vl = 18, html.vc = 6;
         __vbuffer.push('\n');
         __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
         return __vopts && __vopts.asContext ? html : html.toString();
     } catch (e) {
-        html.reportError(e, html.vl, html.vc, '!LB!<div style="display:none" class="modal">!LB!\t<ion-header-bar>!LB!\t\t<h1 class="title">Labeled Flags</h1>!LB!\t\t<div class="buttons">!LB!\t\t<button class="button button-clear js-close">Close</button>!LB!\t\t</div>!LB!\t</ion-header-bar>!LB!\t<ion-content>!LB!\t\t \t<div class="modal-body">!LB!\t\t\t</div>!LB!\t\t\t<div class="list">!LB!\t\t\t<label class="item">!LB!\t\t\t  <button class="js-close button button-block button-positive" type="button">Ok</button>!LB!\t\t\t</label>!LB!\t\t  </div>!LB!\t</ion-content>!LB!</div>!LB!');
+        html.reportError(e, html.vl, html.vc, '!LB!<nav class="navbar navbar-default" role="navigation">!LB!  <div class="container-fluid">!LB!      <ul class="nav navbar-nav navbar-right">!LB!        <li class="dropdown">!LB!          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Add a new record<span class="caret"></span></a>!LB!          <ul class="dropdown-menu" role="menu">!LB!\t\t\t@model.recordTypes.forEach(function(recordType){!LB!\t\t\t\t<li>!LB!\t\t\t\t\t<button class="js-new-record btn btn-block btn-default btn-lg">@recordType</button>!LB!\t\t\t\t</li>!LB!\t\t\t})!LB!          </ul>!LB!        </li>!LB!      </ul>!LB!    </div><!-- /.navbar-collapse -->!LB!  </div><!-- /.container-fluid -->!LB!</nav>!LB!');
     }
 }, {
     'simple': false,
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],13:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":37}],32:[function(require,module,exports){
 var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
@@ -8426,114 +10516,314 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
         html.options = __vopts;
         model = model || {};
         html.vl = 1, html.vc = 0;
-        __vbuffer.push('<div>');
-        html.vl = 1, html.vc = 5;
+        __vbuffer.push('<table class="table table-striped">');
+        html.vl = 1, html.vc = 35;
         __vbuffer.push('\n');
         html.vl = 2, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 2, html.vc = 1;
-        __vbuffer.push('<div class="input-label">');
-        html.vl = 2, html.vc = 26;
+        __vbuffer.push('<tbody>');
+        html.vl = 2, html.vc = 8;
+        __vbuffer.push('</tbody>');
+        html.vl = 2, html.vc = 16;
         __vbuffer.push('\n');
         html.vl = 3, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 3, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 3, html.vc = 2;
-        __vbuffer.push('Add');
-        html.vl = 3, html.vc = 5;
-        __vbuffer.push(' ');
-        html.vl = 3, html.vc = 6;
-        __vbuffer.push('a');
-        html.vl = 3, html.vc = 7;
-        __vbuffer.push(' ');
+        __vbuffer.push('</table>');
         html.vl = 3, html.vc = 8;
-        __vbuffer.push('new');
-        html.vl = 3, html.vc = 11;
-        __vbuffer.push(' ');
-        html.vl = 3, html.vc = 12;
-        __vbuffer.push('record');
-        html.vl = 3, html.vc = 18;
         __vbuffer.push('\n');
         html.vl = 4, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 4, html.vc = 1;
-        __vbuffer.push('</div>');
-        html.vl = 4, html.vc = 7;
         __vbuffer.push('\n');
         html.vl = 5, html.vc = 0;
-        __vbuffer.push('\t');
+        __vbuffer.push('<');
         html.vl = 5, html.vc = 1;
-        __vbuffer.push('<select>');
-        html.vl = 5, html.vc = 9;
+        __vbuffer.push('!');
+        html.vl = 5, html.vc = 2;
+        __vbuffer.push('-');
+        html.vl = 5, html.vc = 3;
+        __vbuffer.push('-');
+        html.vl = 5, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 5, html.vc = 5;
+        __vbuffer.push('Modal');
+        html.vl = 5, html.vc = 10;
+        __vbuffer.push(' ');
+        html.vl = 5, html.vc = 11;
+        __vbuffer.push('-');
+        html.vl = 5, html.vc = 12;
+        __vbuffer.push('-');
+        html.vl = 5, html.vc = 13;
+        __vbuffer.push('>');
+        html.vl = 5, html.vc = 14;
         __vbuffer.push('\n');
         html.vl = 6, html.vc = 0;
-        __vbuffer.push('\t');
-        html.vl = 6, html.vc = 1;
-        __vbuffer.push('\t');
-        html.vl = 6, html.vc = 3;
-        __vbuffer.push(model.recordTypes.forEach(function (recordType) {
-            html.vl = 7, html.vc = 3;
-            __vbuffer.push('<option class="js-new-record">');
-            html.vl = 7, html.vc = 34;
-            __vbuffer.push(html.escape(recordType).toHtmlString());
-            html.vl = 7, html.vc = 34;
-            html.vl = 7, html.vc = 44;
-            __vbuffer.push('</option>');
-        }));
+        __vbuffer.push('<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">');
+        html.vl = 6, html.vc = 102;
+        __vbuffer.push('\n');
+        html.vl = 7, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 7, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 7, html.vc = 2;
+        __vbuffer.push('<div class="modal-dialog">');
+        html.vl = 7, html.vc = 28;
+        __vbuffer.push('\n');
+        html.vl = 8, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 8, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 8, html.vc = 2;
+        __vbuffer.push(' ');
         html.vl = 8, html.vc = 3;
+        __vbuffer.push(' ');
         html.vl = 8, html.vc = 4;
+        __vbuffer.push('<div class="modal-content">');
+        html.vl = 8, html.vc = 31;
         __vbuffer.push('\n');
         html.vl = 9, html.vc = 0;
-        __vbuffer.push('\t');
+        __vbuffer.push(' ');
         html.vl = 9, html.vc = 1;
-        __vbuffer.push('</select>');
-        html.vl = 9, html.vc = 10;
+        __vbuffer.push(' ');
+        html.vl = 9, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 9, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 9, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 9, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 9, html.vc = 6;
+        __vbuffer.push('<div class="modal-header">');
+        html.vl = 9, html.vc = 32;
         __vbuffer.push('\n');
         html.vl = 10, html.vc = 0;
-        __vbuffer.push('</div>');
+        __vbuffer.push(' ');
+        html.vl = 10, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 10, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 10, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 10, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 10, html.vc = 5;
+        __vbuffer.push(' ');
         html.vl = 10, html.vc = 6;
+        __vbuffer.push(' ');
+        html.vl = 10, html.vc = 7;
+        __vbuffer.push(' ');
+        html.vl = 10, html.vc = 8;
+        __vbuffer.push('<button type="button" class="close" data-dismiss="modal">');
+        html.vl = 10, html.vc = 65;
+        __vbuffer.push('<span aria-hidden="true">');
+        html.vl = 10, html.vc = 90;
+        __vbuffer.push('&');
+        html.vl = 10, html.vc = 91;
+        __vbuffer.push('times');
+        html.vl = 10, html.vc = 96;
+        __vbuffer.push(';');
+        html.vl = 10, html.vc = 97;
+        __vbuffer.push('</span>');
+        html.vl = 10, html.vc = 104;
+        __vbuffer.push('<span class="sr-only">');
+        html.vl = 10, html.vc = 126;
+        __vbuffer.push('Close');
+        html.vl = 10, html.vc = 131;
+        __vbuffer.push('</span>');
+        html.vl = 10, html.vc = 138;
+        __vbuffer.push('</button>');
+        html.vl = 10, html.vc = 147;
         __vbuffer.push('\n');
         html.vl = 11, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 11, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 11, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 11, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 11, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 11, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 11, html.vc = 6;
+        __vbuffer.push(' ');
+        html.vl = 11, html.vc = 7;
+        __vbuffer.push(' ');
+        html.vl = 11, html.vc = 8;
+        __vbuffer.push('<h4 class="modal-title" id="myModalLabel">');
+        html.vl = 11, html.vc = 50;
+        __vbuffer.push('Modal');
+        html.vl = 11, html.vc = 55;
+        __vbuffer.push(' ');
+        html.vl = 11, html.vc = 56;
+        __vbuffer.push('title');
+        html.vl = 11, html.vc = 61;
+        __vbuffer.push('</h4>');
+        html.vl = 11, html.vc = 66;
+        __vbuffer.push('\n');
+        html.vl = 12, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 12, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 12, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 12, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 12, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 12, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 12, html.vc = 6;
+        __vbuffer.push('</div>');
+        html.vl = 12, html.vc = 12;
+        __vbuffer.push('\n');
+        html.vl = 13, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 13, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 13, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 13, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 13, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 13, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 13, html.vc = 6;
+        __vbuffer.push('<div class="modal-body">');
+        html.vl = 13, html.vc = 30;
+        __vbuffer.push('\n');
+        html.vl = 14, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 14, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 14, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 14, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 14, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 14, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 14, html.vc = 6;
+        __vbuffer.push(' ');
+        html.vl = 14, html.vc = 7;
+        __vbuffer.push(' ');
+        html.vl = 14, html.vc = 8;
+        __vbuffer.push('.');
+        html.vl = 14, html.vc = 9;
+        __vbuffer.push('.');
+        html.vl = 14, html.vc = 10;
+        __vbuffer.push('.');
+        html.vl = 14, html.vc = 11;
+        __vbuffer.push('\n');
+        html.vl = 15, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 15, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 15, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 15, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 15, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 15, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 15, html.vc = 6;
+        __vbuffer.push('</div>');
+        html.vl = 15, html.vc = 12;
+        __vbuffer.push('\n');
+        html.vl = 16, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 16, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 16, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 16, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 16, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 16, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 16, html.vc = 6;
+        __vbuffer.push('<div class="modal-footer">');
+        html.vl = 16, html.vc = 32;
+        __vbuffer.push('\n');
+        html.vl = 17, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 17, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 17, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 17, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 17, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 17, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 17, html.vc = 6;
+        __vbuffer.push(' ');
+        html.vl = 17, html.vc = 7;
+        __vbuffer.push(' ');
+        html.vl = 17, html.vc = 8;
+        __vbuffer.push('<button type="button" class="btn btn-lg btn-default" data-dismiss="modal">');
+        html.vl = 17, html.vc = 82;
+        __vbuffer.push('Okay');
+        html.vl = 17, html.vc = 86;
+        __vbuffer.push('</button>');
+        html.vl = 17, html.vc = 95;
+        __vbuffer.push('\n');
+        html.vl = 18, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 18, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 18, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 18, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 18, html.vc = 4;
+        __vbuffer.push(' ');
+        html.vl = 18, html.vc = 5;
+        __vbuffer.push(' ');
+        html.vl = 18, html.vc = 6;
+        __vbuffer.push('</div>');
+        html.vl = 18, html.vc = 12;
+        __vbuffer.push('\n');
+        html.vl = 19, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 19, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 19, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 19, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 19, html.vc = 4;
+        __vbuffer.push('</div>');
+        html.vl = 19, html.vc = 10;
+        __vbuffer.push('\n');
+        html.vl = 20, html.vc = 0;
+        __vbuffer.push(' ');
+        html.vl = 20, html.vc = 1;
+        __vbuffer.push(' ');
+        html.vl = 20, html.vc = 2;
+        __vbuffer.push('</div>');
+        html.vl = 20, html.vc = 8;
+        __vbuffer.push('\n');
+        html.vl = 21, html.vc = 0;
+        __vbuffer.push('</div>');
+        html.vl = 21, html.vc = 6;
         __vbuffer.push('\n');
         __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
         return __vopts && __vopts.asContext ? html : html.toString();
     } catch (e) {
-        html.reportError(e, html.vl, html.vc, '<div>!LB!\t<div class="input-label">!LB!\t\tAdd a new record!LB!\t</div>!LB!\t<select>!LB!\t\t@model.recordTypes.forEach(function(recordType){!LB!\t\t\t<option class="js-new-record">@recordType</option>!LB!\t\t})!LB!\t</select>!LB!</div>!LB!!LB!');
+        html.reportError(e, html.vl, html.vc, '<table class="table table-striped">!LB!\t<tbody></tbody>!LB!</table>!LB!!LB!<!-- Modal -->!LB!<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">!LB!  <div class="modal-dialog">!LB!    <div class="modal-content">!LB!      <div class="modal-header">!LB!        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>!LB!        <h4 class="modal-title" id="myModalLabel">Modal title</h4>!LB!      </div>!LB!      <div class="modal-body">!LB!        ...!LB!      </div>!LB!      <div class="modal-footer">!LB!        <button type="button" class="btn btn-lg btn-default" data-dismiss="modal">Okay</button>!LB!      </div>!LB!    </div>!LB!  </div>!LB!</div>!LB!');
     }
 }, {
     'simple': false,
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],14:[function(require,module,exports){
-var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
-module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
-    try {
-        var __vbuffer = html.buffer;
-        html.options = __vopts;
-        model = model || {};
-        html.vl = 1, html.vc = 0;
-        __vbuffer.push('<ul class="list">');
-        html.vl = 1, html.vc = 17;
-        __vbuffer.push('\n');
-        html.vl = 2, html.vc = 0;
-        __vbuffer.push('</ul>');
-        html.vl = 2, html.vc = 5;
-        __vbuffer.push('\n');
-        html.vl = 3, html.vc = 0;
-        __vbuffer.push('\n');
-        __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
-        return __vopts && __vopts.asContext ? html : html.toString();
-    } catch (e) {
-        html.reportError(e, html.vl, html.vc, '<ul class="list">!LB!</ul>!LB!!LB!');
-    }
-}, {
-    'simple': false,
-    'modelName': 'model',
-    'helpersName': 'html'
-});
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],15:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":37}],33:[function(require,module,exports){
 var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
@@ -8543,39 +10833,105 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
         html.vl = 1, html.vc = 0;
         __vbuffer.push(' ');
         html.vl = 1, html.vc = 1;
-        __vbuffer.push('<div class="item item-icon-right">');
-        html.vl = 1, html.vc = 35;
+        __vbuffer.push('<tr>');
+        html.vl = 1, html.vc = 5;
         __vbuffer.push('\n');
         html.vl = 2, html.vc = 0;
         __vbuffer.push('\t');
-        html.vl = 2, html.vc = 2;
-        __vbuffer.push(html.escape(model.type).toHtmlString());
-        html.vl = 2, html.vc = 8;
-        html.vl = 2, html.vc = 12;
+        html.vl = 2, html.vc = 1;
+        __vbuffer.push('<td>');
+        html.vl = 2, html.vc = 5;
         __vbuffer.push('\n');
         html.vl = 3, html.vc = 0;
         __vbuffer.push('\t');
         html.vl = 3, html.vc = 1;
-        __vbuffer.push('<i class="js-delete icon assertive ion-close-circled">');
-        html.vl = 3, html.vc = 55;
-        __vbuffer.push('</i>');
-        html.vl = 3, html.vc = 59;
+        __vbuffer.push('\t');
+        html.vl = 3, html.vc = 2;
+        __vbuffer.push('<strong>');
+        html.vl = 3, html.vc = 11;
+        __vbuffer.push(html.escape(model.type).toHtmlString());
+        html.vl = 3, html.vc = 17;
+        html.vl = 3, html.vc = 21;
+        __vbuffer.push('</strong>');
+        html.vl = 3, html.vc = 30;
         __vbuffer.push('\n');
         html.vl = 4, html.vc = 0;
-        __vbuffer.push('</div>');
+        __vbuffer.push('\t');
+        html.vl = 4, html.vc = 1;
+        __vbuffer.push('</td>');
         html.vl = 4, html.vc = 6;
+        __vbuffer.push('\n');
+        html.vl = 5, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 5, html.vc = 1;
+        __vbuffer.push('<td>');
+        html.vl = 5, html.vc = 5;
+        __vbuffer.push('\n');
+        html.vl = 6, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 6, html.vc = 1;
+        __vbuffer.push('</td>');
+        html.vl = 6, html.vc = 6;
+        __vbuffer.push('\n');
+        html.vl = 7, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 7, html.vc = 1;
+        __vbuffer.push('<td class="text-right">');
+        html.vl = 7, html.vc = 24;
+        __vbuffer.push('\n');
+        html.vl = 8, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 8, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 8, html.vc = 2;
+        __vbuffer.push('<button type="button" class="js-delete btn btn-danger btn-lg">');
+        html.vl = 8, html.vc = 64;
+        __vbuffer.push('\n');
+        html.vl = 9, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 9, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 9, html.vc = 2;
+        __vbuffer.push('\t');
+        html.vl = 9, html.vc = 3;
+        __vbuffer.push('<span class="glyphicon glyphicon-remove">');
+        html.vl = 9, html.vc = 44;
+        __vbuffer.push('</span>');
+        html.vl = 9, html.vc = 51;
+        __vbuffer.push('\n');
+        html.vl = 10, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 10, html.vc = 1;
+        __vbuffer.push('\t');
+        html.vl = 10, html.vc = 2;
+        __vbuffer.push(' ');
+        html.vl = 10, html.vc = 3;
+        __vbuffer.push(' ');
+        html.vl = 10, html.vc = 4;
+        __vbuffer.push('</button>');
+        html.vl = 10, html.vc = 13;
+        __vbuffer.push('\n');
+        html.vl = 11, html.vc = 0;
+        __vbuffer.push('\t');
+        html.vl = 11, html.vc = 1;
+        __vbuffer.push('</td>');
+        html.vl = 11, html.vc = 6;
+        __vbuffer.push('\n');
+        html.vl = 12, html.vc = 0;
+        __vbuffer.push('</tr>');
+        html.vl = 12, html.vc = 5;
         __vbuffer.push('\n');
         __vopts && __vopts.onRenderEnd && __vopts.onRenderEnd(null, html);
         return __vopts && __vopts.asContext ? html : html.toString();
     } catch (e) {
-        html.reportError(e, html.vl, html.vc, ' <div class="item item-icon-right">!LB!\t@model.type!LB!\t<i class="js-delete icon assertive ion-close-circled"></i>!LB!</div>!LB!');
+        html.reportError(e, html.vl, html.vc, ' <tr>!LB!\t<td>!LB!\t\t<strong>@model.type</strong>!LB!\t</td>!LB!\t<td>!LB!\t</td>!LB!\t<td class="text-right">!LB!\t\t<button type="button" class="js-delete btn btn-danger btn-lg">!LB!\t\t\t<span class="glyphicon glyphicon-remove"></span>!LB!\t\t  </button>!LB!\t</td>!LB!</tr>!LB!');
     }
 }, {
     'simple': false,
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],16:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":37}],34:[function(require,module,exports){
 var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
@@ -8772,7 +11128,7 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],17:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":37}],35:[function(require,module,exports){
 var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
@@ -8885,7 +11241,7 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],18:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":37}],36:[function(require,module,exports){
 var vash = require('/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js');
 module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     try {
@@ -9018,7 +11374,7 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
     'modelName': 'model',
     'helpersName': 'html'
 });
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":19}],19:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/node_modules/vash/build/vash-runtime-all.min.js":37}],37:[function(require,module,exports){
 /**
  * Vash - JavaScript Template Parser, v0.7.12-1
  *
@@ -9027,48 +11383,18 @@ module.exports = vash.link(function anonymous(model, html, __vopts, vash) {
  * Copyright (c) 2013 Andrew Petersen
  * MIT License (LICENSE)
  */void 0,function(){function i(a,b){typeof b=="function"&&(b={onRenderEnd:b}),a&&a.onRenderEnd&&(b=b||{},b.onRenderEnd||(b.onRenderEnd=a.onRenderEnd),delete a.onRenderEnd),b||(b={});return b}vash=typeof vash=="undefined"?{}:vash,vash.compile||(typeof define=="function"&&define.amd?define(function(){return vash}):typeof module=="object"&&module.exports?module.exports=vash:window.vash=vash);var a=vash.helpers,b=function(a){this.buffer=new f,this.model=a,this.options=null,this.vl=0,this.vc=0};vash.helpers=a=b.prototype={constructor:b,config:{},tplcache:{}},a.toString=a.toHtmlString=function(){return this.buffer._vo.join("")};var c=/[&<>"'`]/g,d=function(a){return e[a]},e={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#x27;","`":"&#x60;"};a.raw=function(a){var b=function(){return a};a=a!=null?a:"";return{toHtmlString:b,toString:b}},a.escape=function(a){var b=function(){return a};a=a!=null?a:"";if(typeof a.toHtmlString!="function"){a=a.toString().replace(c,d);return{toHtmlString:b,toString:b}}return a};var f=function(){this._vo=[]};f.prototype.mark=function(a){var b=new g(this,a);b.markedIndex=this._vo.length,this._vo.push(b.uid);return b},f.prototype.fromMark=function(a){var b=a.findInBuffer();if(b>-1){a.destroy();return this._vo.splice(b,this._vo.length)}return[]},f.prototype.spliceMark=function(a,b,c){var d=a.findInBuffer();if(d>-1){a.destroy(),arguments[0]=d;return this._vo.splice.apply(this._vo,arguments)}return[]},f.prototype.empty=function(){return this._vo.splice(0,this._vo.length)},f.prototype.push=function(a){return this._vo.push(a)},f.prototype.pushConcat=function(a){var b;Array.isArray(a)?b=a:arguments.length>1?b=Array.prototype.slice.call(arguments):b=[a];for(var c=0;c<b.length;c++)this._vo.push(b[c]);return this.__vo},f.prototype.indexOf=function(a){for(var b=0;b<this._vo.length;b++)if(a.test&&this._vo[b]&&this._vo[b].search(a)>-1||this._vo[b]==a)return b;return-1},f.prototype.lastIndexOf=function(a){var b=this._vo.length;while(--b>=0)if(a.test&&this._vo[b]&&this._vo[b].search(a)>-1||this._vo[b]==a)return b;return-1},f.prototype.splice=function(){return this._vo.splice.apply(this._vo,arguments)},f.prototype.index=function(a){return this._vo[a]},f.prototype.flush=function(){return this.empty().join("")},f.prototype.toString=f.prototype.toHtmlString=function(){return this._vo.join("")};var g=vash.Mark=function(a,b){this.uid="[VASHMARK-"+~~(Math.random()*1e7)+(b?":"+b:"")+"]",this.markedIndex=0,this.buffer=a,this.destroyed=!1},h=g.re=/\[VASHMARK\-\d{1,8}(?::[\s\S]+?)?]/g;g.uidLike=function(a){return(a||"").search(h)>-1},g.prototype.destroy=function(){var a=this.findInBuffer();a>-1&&(this.buffer.splice(a,1),this.markedIndex=-1),this.destroyed=!0},g.prototype.findInBuffer=function(){if(this.destroyed)return-1;if(this.markedIndex&&this.buffer.index(this.markedIndex)===this.uid)return this.markedIndex;var a=this.uid.replace(/(\[|\])/g,"\\$1"),b=new RegExp(a);return this.markedIndex=this.buffer.indexOf(b)},a.constructor.reportError=function(a,b,c,d,e){e=e||"!LB!";var f=d.split(e),g=b===0&&c===0?f.length-1:3,h=Math.max(0,b-g),i=Math.min(f.length,b+g),j=f.slice(h,i).map(function(a,c,d){var e=c+h+1;return(e===b?"  > ":"    ")+(e<10?" ":"")+e+" | "+a}).join("\n");a.vashlineno=b,a.vashcharno=c,a.message="Problem while rendering template at line "+b+", character "+c+".\nOriginal message: "+a.message+"."+"\nContext: \n\n"+j+"\n\n";throw a},a.reportError=function(){this.constructor.reportError.apply(this,arguments)},vash.link=function(c,d){var e,f;d.args||(d.args=[d.modelName,d.helpersName,"__vopts","vash"]);if(typeof c=="string"){e=c;try{f=d.args.slice(),f.push(c),c=Function.apply(null,f)}catch(g){a.reportError(g,0,0,e,/\n/)}}c.options={simple:d.simple,modelName:d.modelName,helpersName:d.helpersName};var h;d.asHelper?(c.options.args=d.args,c.options.asHelper=d.asHelper,h=function(){return c.apply(this,j.call(arguments))},a[d.asHelper]=h):h=function(a,e){if(d.simple){var f={buffer:[],escape:b.prototype.escape,raw:b.prototype.raw};return c(a,f,e,vash)}e=i(a,e);return c(a,e&&e.context||new b(a),e,vash)},h.toString=function(){return c.toString()},h._toString=function(){return Function.prototype.toString.call(h)},h.toClientString=function(){return"vash.link( "+c.toString()+", "+JSON.stringify(c.options)+" )"};return h};var j=Array.prototype.slice;vash.lookup=function(a,b){var c=vash.helpers.tplcache[a];if(!c)throw new Error("Could not find template: "+a);return b?c(b):c},vash.install=function(a,b){var c=vash.helpers.tplcache;if(typeof b=="string"){if(!vash.compile)throw new Error("vash.install(path, [string]) is not available in the standalone runtime.");b=vash.compile(b)}else if(typeof a=="object"){b=a,Object.keys(b).forEach(function(a){c[a]=b[a]});return c}return c[a]=b},vash.uninstall=function(a){var b=vash.helpers.tplcache,c=!1;if(typeof a=="string")return delete b[a];Object.keys(b).forEach(function(d){b[d]===a&&(c=delete b[d])});return c}}(),function(){var a=vash.helpers;a.trim=function(a){return a.replace(/^\s*|\s*$/g,"")},a.config.highlighter=null,a.highlight=function(b,c){var d=this.buffer.mark();c();var e=this.buffer.fromMark(d);this.buffer.push("<pre><code>"),a.config.highlighter?this.buffer.push(a.config.highlighter(b,e.join("")).value):this.buffer.push(e),this.buffer.push("</code></pre>")}}(),function(){function d(a){var b=vash.Mark.re,c=[],d="";a.forEach(function(a){b.exec(a)?(c.push(d,a),d=""):d+=a||""}),c.push(d);return c}if(typeof window=="undefined")var a=require("fs"),b=require("path");var c=vash.helpers;c.config.browser=!1,vash.loadFile=function(d,e,f){e=vQuery.extend({},vash.config,e||{});var g=c.config.browser,h;!g&&e.settings&&e.settings.views&&(d=b.normalize(d),d.indexOf(b.normalize(e.settings.views))===-1&&(d=b.join(e.settings.views,d)),b.extname(d)||(d+="."+(e.settings["view engine"]||"vash")));try{h=e.cache||g?c.tplcache[d]||(c.tplcache[d]=vash.compile(a.readFileSync(d,"utf8"))):vash.compile(a.readFileSync(d,"utf8")),f&&f(null,h)}catch(i){f&&f(i,null)}},vash.renderFile=function(a,b,c){vash.loadFile(a,b,function(a,d){var e=b.onRenderEnd;c(a,!a&&d(b,function(a,b){b.finishLayout(),e&&e(a,b)}))})},c._ensureLayoutProps=function(){this.appends=this.appends||{},this.prepends=this.prepends||{},this.blocks=this.blocks||{},this.blockMarks=this.blockMarks||{}},c.finishLayout=function(){this._ensureLayoutProps();var a=this,b,c,e,f,g,h,i,j;for(b in this.blockMarks)c=this.blockMarks[b],f=this.prepends[b],e=this.blocks[b],g=this.appends[b],h=c.pop(),i=this.buffer.mark(),f&&f.forEach(function(b){a.buffer.pushConcat(b)}),block=e.pop(),block&&this.buffer.pushConcat(block),g&&g.forEach(function(b){a.buffer.pushConcat(b)}),j=this.buffer.fromMark(i),j=d(j),j.unshift(h,0),this.buffer.spliceMark.apply(this.buffer,j);for(b in this.blockMarks)this.blockMarks[b].forEach(function(a){a.destroy()});delete this.blockMarks,delete this.prepends,delete this.blocks,delete this.appends;return this.toString()},c.extend=function(a,b){var c=this,d=this.buffer,e=this.model,f;this._ensureLayoutProps(),vash.loadFile(a,this.model,function(a,d){var e=c.buffer.mark();b(c.model);var f=c.buffer.fromMark(e);c.isExtending=!0,d(c.model,{context:c}),c.isExtending=!1}),this.model=e},c.include=function(a,b){var c=this,d=this.buffer,e=this.model;vash.loadFile(a,this.model,function(a,d){d(b||c.model,{context:c})}),this.model=e},c.block=function(a,b){this._ensureLayoutProps();var c=this,d=this.blockMarks[a]||(this.blockMarks[a]=[]),e=this.blocks[a]||(this.blocks[a]=[]),f,g;b&&(f=this.buffer.mark(),b(this.model),g=this.buffer.fromMark(f),g.length&&!this.isExtending&&e.push(g),g.length&&this.isExtending&&e.unshift(g)),d.push(this.buffer.mark("block-"+a))},c._handlePrependAppend=function(a,b,c){this._ensureLayoutProps();var d=this.buffer.mark(),e,f=this[a],g=f[b]||(f[b]=[]);c(this.model),e=this.buffer.fromMark(d),g.push(e)},c.append=function(a,b){this._handlePrependAppend("appends",a,b)},c.prepend=function(a,b){this._handlePrependAppend("prepends",a,b)}}()
-},{"fs":2,"path":5}],20:[function(require,module,exports){
-var $ = window.$,
-	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/2_index.vash.js");
-
-
-function Modal(title, $content){
-	var $modal = $(template({title: title}));
-	$modal.find('h1.title').text(title);
-	$modal.find('.modal-body')
-		.empty()
-		.append($content);
-
-	$modal.find('.js-close')
-		.on('click', function(ev){
-			ev.preventDefault();
-			$modal.fadeOut(function(){
-				$modal.slideUp();
-			});
-		});
-
-	this.show = function(){
-		$modal.slideDown();
-		$('body').append($modal);
-	};
-}
-
-module.exports = Modal;
-
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/2_index.vash.js":12}],21:[function(require,module,exports){
+},{"fs":2,"path":5}],38:[function(require,module,exports){
 
 var $ = window.$,
 	_ = require('lodash'),
-	Modal = require('modal'),
-	listTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/4_index.vash.js"),
-	itemTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/5_item.vash.js");
+	listTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/2_index.vash.js"),
+	itemTemplate = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/3_item.vash.js");
 
 
 function RecordList(){
 	var self = this, 
 		items = [];
 
-	var modal;
 	this.$element = $(listTemplate({}));
 
 	this.add = function(record){
@@ -9081,7 +11407,6 @@ function RecordList(){
 				$item: $item,
 			};
 
-
 		$item.find('.js-delete')
 			.on('click', function(ev){
 				ev.stopPropagation();
@@ -9093,12 +11418,17 @@ function RecordList(){
 			});
 
 		$item.on('click', function(){
-			modal = new Modal(item.record.type, item.record.$element);
-			modal.show();
+				var $modal = self.$element.filter('.modal');
+				$modal.find('.modal-title').text(item.record.type);
+				$modal.find('.modal-body')
+					.empty()
+					.append(item.record.$element);
+
+				$modal.modal({show: true});
 			});
 
 		items.push(item);
-		this.$element.filter('.list').append($item);
+		this.$element.find('tbody').append($item);
 	};
 
 
@@ -9113,11 +11443,11 @@ function RecordList(){
 
 module.exports = RecordList;
 
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/4_index.vash.js":14,"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/5_item.vash.js":15,"lodash":9,"modal":20}],22:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/2_index.vash.js":32,"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/3_item.vash.js":33,"lodash":9}],39:[function(require,module,exports){
 var $ = window.$,
 	util = require('util'),
 	EventEmitter = require('events').EventEmitter,
-	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/3_index.vash.js");
+	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/1_index.vash.js");
 
 
 function RecordSelector(params){
@@ -9129,11 +11459,11 @@ function RecordSelector(params){
 		}));
 
 	$(this.$element)
-		.find('select')
-		.on('change', function(){
+		.find('.js-new-record')
+		.on('click', function(){
 			var $this = $(this);
 
-			self.emit('new-record', $this.val());
+			self.emit('new-record', $this.text());
 		});
 
 }
@@ -9141,9 +11471,9 @@ function RecordSelector(params){
 util.inherits(RecordSelector, EventEmitter);
 module.exports = RecordSelector;
 
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/3_index.vash.js":13,"events":3,"util":8}],23:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/1_index.vash.js":31,"events":3,"util":8}],40:[function(require,module,exports){
 var $ = window.$,
-	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/6_index.vash.js");
+	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/4_index.vash.js");
 
 function RecordA(){
 
@@ -9165,9 +11495,9 @@ function RecordA(){
 
 module.exports = RecordA;
 
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/6_index.vash.js":16}],24:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/4_index.vash.js":34}],41:[function(require,module,exports){
 var $ = window.$,
-	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/7_index.vash.js");
+	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/5_index.vash.js");
 
 function RecordA(){
 
@@ -9187,9 +11517,9 @@ function RecordA(){
 
 module.exports = RecordA;
 
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/7_index.vash.js":17}],25:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/5_index.vash.js":35}],42:[function(require,module,exports){
 var $ = window.$,
-	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/8_index.vash.js");
+	template = require("/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/6_index.vash.js");
 
 
 function RecordA(){
@@ -9225,11 +11555,40 @@ function RecordA(){
 
 module.exports = RecordA;
 
-},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/8_index.vash.js":18}],26:[function(require,module,exports){
+},{"/Users/jfellman/code/sample-ui-browserify/node_modules/vashify/.temp/6_index.vash.js":36}],43:[function(require,module,exports){
 module.exports = [
 	{name: 'Labeled Flags', ctor: require('./a/') },
 	{name: 'Name and Age', ctor: require('./b/') },
 	{name: 'Current Location', ctor: require('./c/') },
+	{name: 'Reactive View', ctor: require('./reactive/') },
 ];
 
-},{"./a/":23,"./b/":24,"./c/":25}]},{},[1]);
+},{"./a/":40,"./b/":41,"./c/":42,"./reactive/":44}],44:[function(require,module,exports){
+// this does not appear to work.
+// model never changes.
+
+
+var $ = window.$,
+	reactive = require('reactive');
+
+var strTemplate = "<form role=\"form\">\n  <div class=\"form-group\">\n    <label>Label</label>\n\t<span>{test}</span>\n  </div>\n  <div class=\"form-group\">\n    <label>Label</label>\n\t<input value=\"{label}\" type=\"text\" class=\"form-control\" placeholder=\"Label\">\n  </div>\n  <div class=\"form-group\">\n    <label>Label</label>\n    <input data-value=\"label2\" type=\"text\" class=\"form-control\" placeholder=\"Label\">\n  </div>\n  <div class=\"checkbox\">\n    <label>\n      <input data-checked=\"flagA\" type=\"checkbox\"> Flag A\n    </label>\n  </div>\n  <div class=\"checkbox\">\n    <label>\n      <input data-checked=\"flagB\" type=\"checkbox\"> Flag B\n    </label>\n  </div>\n</form>\n";
+
+function ReactiveRecord(){
+	var self = this,
+		model = {
+			test: 'this is a test field',
+			label: 'hello',
+			label2: 'goodbye',
+			flagA: false,
+			flagB: true,
+		},
+		view = reactive(strTemplate, model);
+
+	self.type = 'Reactive Record';
+	self.$element = $(view.el);
+	self.getData = function(){ return model; };
+}
+
+module.exports = ReactiveRecord;
+
+},{"reactive":15}]},{},[1]);
